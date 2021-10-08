@@ -1,24 +1,31 @@
-import { createExpressApp } from "./src/app.js";
-import http from "http";
-import { envVars } from "./src/config/config.js";
-import dotenv from 'dotenv';
+import { createExpressApp } from './src/app'
+import http from 'http'
+import dotenv from 'dotenv'
+import { connectToDB } from './src/db'
+import { getEnvVar } from './src/helpers'
 
-function launchApp() {
+async function launchApp() {
     try {
         dotenv.config()
 
-        const app = createExpressApp();
-        const port = process.env.PORT || 8080;
-        const host = process.env.NODE_ENV === envVars.dev ? '' : '0.0.0.0';
+        const app = createExpressApp()
+        const port = process.env.PORT || 8080
+        const host = getEnvVar('APP_HOST')
 
-        const server = http.createServer(app);
+        const server = http.createServer(app)
+
+        await connectToDB()
 
         server.listen(port, host, () => {
-            console.log(`Students Courses app started on port: ${port}, host: ${host}`);
-        });
-    } catch (e) {
-        console.error(`Failed to start the app:`, e);
+            console.log(`App started on port: ${port}, host: ${host}`)
+        })
+    } catch (error) {
+        console.error(`Failed to start the app:`, error)
     }
 }
 
-launchApp()
+;(async () => {
+    await launchApp()
+})()
+
+//exports.name = 'value';
