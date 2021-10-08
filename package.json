@@ -2,12 +2,13 @@
   "name": "students-courses",
   "version": "1.0.0",
   "description": "An app for students to take and pass courses",
-  "main": "index.js",
   "type": "module",
+  "main": "./index.js",
   "scripts": {
-    "start": "node app",
-    "dev": "nodemon app",
-    "lint": "eslint '**/*.{js,ts}' --quiet --fix",
+    "start": "node --experimental-specifier-resolution=node index.js",
+    "dev": "nodemon --experimental-specifier-resolution=node index.js",
+    "lint": "eslint '**/*.{js}' --quiet --fix",
+    "prettify": "prettier --write \"src/**/*.js\" \"index.js\"",
     "test": "jest --coverage"
   },
   "dependencies": {
@@ -17,11 +18,25 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "helmet": "^4.6.0",
-    "passport-jwt": "^4.0.0"
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^3.1.2",
+    "passport-jwt": "^4.0.0",
+    "pg": "^8.7.1",
+    "sequelize": "^6.6.5",
+    "yup": "^0.32.9"
   },
   "devDependencies": {
-    "eslint": "^7.30.0",
+    "eslint": "^7.32.0",
     "nodemon": "^2.0.9",
     "prettier": "^2.3.2"
+  },
+  "lint-staged": {
+    "**/*.{js,json}": "npm run prettify",
+    "**/*.js": "npm run lint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
