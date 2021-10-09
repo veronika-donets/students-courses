@@ -126,7 +126,7 @@ export const getUserByCredentials = async (email, password) => {
 
 export const generateAuthToken = async (user) => {
     return jwt.sign(
-        { data: user },
+        { data: { id: user.id } },
         process.env.AUTH_SECRET_KEY,
         { expiresIn: 604800 } // 1 week
     )
@@ -160,18 +160,6 @@ export const updateIsEmailVerified = async (id, isEmailVerified) => {
     return User.update({ isEmailVerified }, { where: { id } })
 }
 
-export const isAdmin = (user) => {
-    return user.role === USER_ROLES.ADMIN
-}
-
-export const isInstructor = (user) => {
-    return user.role === USER_ROLES.INSTRUCTOR
-}
-
-export const isStudent = (user) => {
-    return user.role === USER_ROLES.STUDENT
-}
-
 export const resetPassword = async (id, password) => {
     try {
         const user = await getUserById(id)
@@ -192,9 +180,15 @@ export const resetPassword = async (id, password) => {
     }
 }
 
-export const updateUserRole = async (id, role) => {
-    return User.update({ role }, { where: { id } })
+export const updateUserRole = (id, newRole) => {
+    const role = newRole ? newRole.toUpperCase() : ''
+    const isRoleExists = Object.values(USER_ROLES).some((el) => el === role)
+    if (isRoleExists) {
+        return User.update({ role }, { where: { id } })
+    }
+    return null
 }
 
-//TODO
-export const removeUser = (email) => User.remove({ email })
+export const removeUser = (email) => {
+    return User.destroy({ where: { email } })
+}

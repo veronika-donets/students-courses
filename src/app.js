@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import cors from 'cors'
 import appRoutes from './routes/app.routes'
 import userRoutes from './routes/users.routes'
+import passport from 'passport'
 
 export function createExpressApp() {
     const app = express()
@@ -18,6 +19,7 @@ export function createExpressApp() {
 
     app.use(bodyParser.json({ limit: '50mb' }))
     app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
+    app.use(passport.initialize())
     app.use(helmet())
 
     app.use('/', appRoutes)
