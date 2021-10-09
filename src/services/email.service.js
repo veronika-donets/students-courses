@@ -33,7 +33,7 @@ const replaceLink = (template, link) => {
 export const sendResetPassEmail = async (emailAddress, token) => {
     try {
         const webUrl = getEnvVar('WEB_APP')
-        const linkTemplate = replaceLink(resetPasswordTemplate, `${webUrl}/set-password/${token}`)
+        const linkTemplate = replaceLink(resetPasswordTemplate, `${webUrl}/set-password?t=${token}`)
 
         return sendEmail(emailAddress, 'Reset Password', linkTemplate)
     } catch (e) {
@@ -44,7 +44,7 @@ export const sendResetPassEmail = async (emailAddress, token) => {
 export const sendVerificationEmail = async (emailAddress, token) => {
     try {
         const webUrl = getEnvVar('WEB_APP')
-        const linkTemplate = replaceLink(verifyEmailTemplate, `${webUrl}/verify/email/${token}`)
+        const linkTemplate = replaceLink(verifyEmailTemplate, `${webUrl}/verify/email?t=${token}`)
 
         return sendEmail(emailAddress, 'Verify Email', linkTemplate)
     } catch (e) {

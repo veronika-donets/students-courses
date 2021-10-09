@@ -5,12 +5,14 @@ import {
     getUserByCredentials,
     getUserByEmail,
     getUserById,
+    removeUser,
     resetPassword,
     updateIsEmailVerified,
     updateUserRole,
 } from '../models/user'
 import { sendResetPassEmail, sendVerificationEmail } from '../services/email.service'
 import jwt_decode from 'jwt-decode'
+import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
 
 const router = Router()
@@ -173,6 +175,58 @@ router.post('/verify/email/confirm', async (req, res) => {
         }
     } catch (e) {
         res.status(403).json({ message: 'Email verification failed' })
+    }
+})
+
+router.put('/role', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+    try {
+        const { id, role } = req.body
+
+        if (!id || !role) {
+            return res.status(400).json({ message: 'User id or role is not provided' })
+        }
+
+        const user = await getUserById(id)
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+        const result = await updateUserRole(id, role)
+
+        if (!result) {
+            return res.status(400).json({ message: 'Update user role failed' })
+        }
+
+        res.json({ message: 'Update user role success' })
+    } catch (e) {
+        res.status(400).json({ message: 'Update user role failed' })
+    }
+})
+
+router.delete('/remove', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+    try {
+        const { email } = req.body
+
+        if (!email) {
+            return res.status(400).json({ message: 'User email is not provided' })
+        }
+
+        const user = await getUserByEmail(email)
+
+        if (user.role === USER_ROLES.ADMIN) {
+            return res.status(400).json({ message: 'Admin user cannot be removed' })
+        }
+
+        const result = await removeUser(email)
+
+        if (!result) {
+            return res.status(400).json({ message: 'Cannot remove user' })
+        }
+
+        res.json({ message: 'User removed' })
+    } catch (e) {
+        res.status(400).json({ message: 'Cannot remove user' })
     }
 })
 
