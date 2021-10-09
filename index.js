@@ -27,5 +27,3 @@ async function launchApp() {
 ;(async () => {
     await launchApp()
 })()
-
-//exports.name = 'value';
