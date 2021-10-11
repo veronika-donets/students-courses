@@ -51,7 +51,7 @@ passport.use(
             const { id } = jwt_payload.data
             const user = await getUserById(id)
 
-            if (user && user.role === USER_ROLES.INSTRUCTOR) {
+            if (user && user.role === USER_ROLES.STUDENT) {
                 return done(null, user)
             } else {
                 return done(null, false)

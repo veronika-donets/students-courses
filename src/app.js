@@ -3,7 +3,8 @@ import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import cors from 'cors'
 import appRoutes from './routes/app.routes'
-import userRoutes from './routes/users.routes'
+import users from './routes/users.routes'
+import courses from './routes/courses.routes'
 import passport from 'passport'
 
 export function createExpressApp() {
@@ -23,7 +24,8 @@ export function createExpressApp() {
     app.use(helmet())
 
     app.use('/', appRoutes)
-    app.use('/users', userRoutes)
+    app.use('/users', users)
+    app.use('/courses', courses)
 
     return app
 }
