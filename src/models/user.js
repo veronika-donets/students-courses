@@ -3,6 +3,7 @@ import { sequelize } from '../db.js'
 import Sequelize from 'sequelize'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import jwt_decode from 'jwt-decode'
 
 class UserModel extends Sequelize.Model {}
 
@@ -132,6 +133,11 @@ export const generateAuthToken = async (user) => {
     )
 }
 
+export const getUserIdFromToken = async (token) => {
+    const { data } = jwt_decode(token)
+    return data && data.id ? data.id : null
+}
+
 export const createUser = async ({ firstName, lastName, email, password, agreeTOS }) => {
     return User.create({ firstName, lastName, email, password, agreeTOS })
 }
@@ -156,7 +162,7 @@ export const updatePassword = (id, password) => {
     return User.update({ password }, { where: { id } })
 }
 
-export const updateIsEmailVerified = async (id, isEmailVerified) => {
+export const updateIsEmailVerified = (id, isEmailVerified) => {
     return User.update({ isEmailVerified }, { where: { id } })
 }
 

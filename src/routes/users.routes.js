@@ -5,6 +5,7 @@ import {
     getUserByCredentials,
     getUserByEmail,
     getUserById,
+    getUserIdFromToken,
     removeUser,
     resetPassword,
     updateIsEmailVerified,
@@ -21,7 +22,7 @@ router.post('/register', async (req, res) => {
     try {
         const { id, firstName, lastName, email, isEmailVerified, role } = await createUser(req.body)
 
-        const newUser = {
+        const user = {
             id,
             firstName,
             lastName,
@@ -30,7 +31,11 @@ router.post('/register', async (req, res) => {
             role,
         }
 
-        res.json({ user: newUser })
+        // Send email verification
+        const token = await generateAuthToken({ id })
+        await sendVerificationEmail(email, token)
+
+        res.json({ user })
     } catch (e) {
         res.status(400).json({ message: e.message })
     }
@@ -38,21 +43,22 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body
-        const user = await getUserByCredentials(email, password)
+        const { email: userEmail, password } = req.body
+        const { id, email, isEmailVerified, firstName, lastName, role } =
+            await getUserByCredentials(userEmail, password)
 
-        const token = await generateAuthToken(user)
+        const token = await generateAuthToken({ id })
 
-        await res.json({
+        res.json({
             token,
-            id: user.id,
-            email: user.email,
-            isEmailVerified: user.isEmailVerified,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
+            id,
+            email,
+            isEmailVerified,
+            firstName,
+            lastName,
+            role,
         })
-    } catch (e) {
+    } catch {
         res.status(401).json({ message: 'Login failed. Please check email/password and try again' })
     }
 })
@@ -68,7 +74,7 @@ router.post('/reset-password', async (req, res) => {
             return res.status(404).json({ message: 'User not found' })
         }
 
-        const token = await generateAuthToken(user)
+        const token = await generateAuthToken({ id: user.id })
         const response = await sendResetPassEmail(email, token)
 
         if (!response) {
@@ -76,8 +82,8 @@ router.post('/reset-password', async (req, res) => {
         }
 
         res.status(200).json({ message: 'Reset password email has been sent' })
-    } catch (e) {
-        return res.status(403).json({ message: e })
+    } catch {
+        return res.status(400).json({ message: 'Reset password failed' })
     }
 })
 
@@ -123,7 +129,7 @@ router.post('/verify/email/send', async (req, res) => {
             return res.status(404).json({ message: 'User not found' })
         }
 
-        const token = await generateAuthToken(user)
+        const token = await generateAuthToken({ id: user.id })
         const response = await sendVerificationEmail(email, token)
 
         if (!response) {
@@ -149,32 +155,32 @@ router.post('/verify/email/confirm', async (req, res) => {
             return res.status(403).json({ message: 'User token is not provided' })
         }
 
-        const { data } = jwt_decode(token)
+        const id = await getUserIdFromToken(token)
 
-        if (data) {
-            const { id } = data
-
-            const { email, isEmailVerified, role } = await getUserById(id)
-
-            if (isEmailVerified) {
-                return res.status(400).json({ message: 'Email is already verified' })
-            }
-
-            // Update user role to admin
-            if (email === process.env.COURSES_ADMIN_EMAIL && role !== USER_ROLES.ADMIN) {
-                await updateUserRole(id, USER_ROLES.ADMIN)
-            }
-
-            const user = await updateIsEmailVerified(id, true)
-
-            if (!user) {
-                return res.status(403).json({ message: 'Email verification failed' })
-            }
-
-            res.json({ message: 'Email verification success' })
+        if (!id) {
+            return res.status(404).json({ message: 'User not found' })
         }
+
+        const { email, isEmailVerified, role } = await getUserById(id)
+
+        if (isEmailVerified) {
+            return res.status(400).json({ message: 'Email is already verified' })
+        }
+
+        // Update user role to admin
+        if (email === process.env.COURSES_ADMIN_EMAIL && role !== USER_ROLES.ADMIN) {
+            await updateUserRole(id, USER_ROLES.ADMIN)
+        }
+
+        const user = await updateIsEmailVerified(id, true)
+
+        if (!user) {
+            return res.status(400).json({ message: 'Email verification failed' })
+        }
+
+        res.json({ message: 'Email verification success' })
     } catch (e) {
-        res.status(403).json({ message: 'Email verification failed' })
+        res.status(400).json({ message: 'Email verification failed' })
     }
 })
 
@@ -201,6 +207,25 @@ router.put('/role', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) 
         res.json({ message: 'Update user role success' })
     } catch (e) {
         res.status(400).json({ message: 'Update user role failed' })
+    }
+})
+
+router.post('/token', async (req, res) => {
+    try {
+        const userEmail = req.body.email
+        const email = userEmail ? userEmail.toLowerCase() : undefined
+
+        const user = await getUserByEmail(email)
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+        const token = await generateAuthToken({ id: user.id })
+
+        res.status(200).json({ token })
+    } catch (e) {
+        res.status(403).json({ message: 'Sending email verification failed' })
     }
 })
 
