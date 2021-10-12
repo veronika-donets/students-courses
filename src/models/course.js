@@ -135,41 +135,77 @@ export const findStartedCourses = async (studentId) => {
 }
 
 export const findAvailableCourses = (limit, offset, isActive = true) => {
-    const filter = isActive ? {
-        where: sequelize.where(
-            sequelize.fn('array_length', sequelize.col('lessonsIds'), 1),
-            { [Sequelize.Op.gte]: 5 },
-        ),
-        attributes: ['id', 'title', 'description', 'instructorIds'],
-    } : {}
+    const filter = isActive
+        ? {
+              where: sequelize.where(sequelize.fn('array_length', sequelize.col('lessonsIds'), 1), {
+                  [Sequelize.Op.gte]: 5,
+              }),
+              attributes: ['id', 'title', 'description', 'instructorIds'],
+          }
+        : {}
 
     return Course.findAll({
         limit: limit || 50,
         offset: offset,
         row: true,
-        attributes: ['id', 'title', 'description', 'instructorIds', 'lessonsIds', 'startedIds', 'completedIds'],
-        ...filter
+        attributes: [
+            'id',
+            'title',
+            'description',
+            'instructorIds',
+            'lessonsIds',
+            'startedIds',
+            'completedIds',
+        ],
+        ...filter,
     })
 }
 
 export const findCoursesByUserId = (id, role) => {
-    const filter = role === USER_ROLES.INSTRUCTOR ? {
-        where: {
-            instructorIds: [id]
-        },
-        attributes: ['id', 'title', 'description', 'instructorIds', 'lessonsIds', 'startedIds', 'completedIds'],
-    } : {
-        where: {
-            [Sequelize.Op.or]: {
-                startedIds: [id],
-                completedIds: [id]
-            }
-        },
-        attributes: ['id', 'title', 'description', 'instructorIds', 'lessonsIds', 'startedIds', 'completedIds'],
-    }
+    const filter =
+        role === USER_ROLES.INSTRUCTOR
+            ? {
+                  where: {
+                      instructorIds: [id],
+                  },
+                  attributes: [
+                      'id',
+                      'title',
+                      'description',
+                      'instructorIds',
+                      'lessonsIds',
+                      'startedIds',
+                      'completedIds',
+                  ],
+              }
+            : {
+                  where: {
+                      [Sequelize.Op.or]: {
+                          startedIds: [id],
+                          completedIds: [id],
+                      },
+                  },
+                  attributes: [
+                      'id',
+                      'title',
+                      'description',
+                      'instructorIds',
+                      'lessonsIds',
+                      'startedIds',
+                      'completedIds',
+                  ],
+              }
 
     return Course.findAll({
-        attributes: ['id', 'title', 'description', 'instructorIds', 'lessonsIds', 'startedIds', 'completedIds'],
-        ...filter
+        attributes: [
+            'id',
+            'title',
+            'description',
+            'instructorIds',
+            'lessonsIds',
+            'startedIds',
+            'completedIds',
+        ],
+        ...filter,
     })
 }

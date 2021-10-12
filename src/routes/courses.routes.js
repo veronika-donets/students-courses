@@ -4,7 +4,9 @@ import { USER_ROLES } from '../helpers'
 import {
     assignInstructorToCourse,
     completeCourse,
-    createCourse, findAvailableCourses, findCoursesByUserId,
+    createCourse,
+    findAvailableCourses,
+    findCoursesByUserId,
     findStartedCourses,
     getCourseById,
     startCourse,
@@ -145,8 +147,6 @@ router.post('/start', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
             return res.status(400).json({ message: 'Course is already started' })
         }
 
-
-
         const result = await startCourse(courseId, studentId)
 
         if (!result) {
@@ -200,7 +200,6 @@ router.post('/complete', passport.authenticate([USER_ROLES.STUDENT]), async (req
 })
 
 router.get('/available', async (req, res) => {
-
     // For admin all courses is available
     // For all authorized and unauthorized users all prepared courses (contains >= 5 lessons) is available
 
@@ -227,34 +226,48 @@ router.get('/available', async (req, res) => {
     }
 })
 
-router.get('/my', passport.authenticate([USER_ROLES.STUDENT, USER_ROLES.INSTRUCTOR]), async (req, res) => {
-    try {
-        const { jwt } = req.headers
-        const userId = await getUserIdFromToken(jwt)
-        const { role } = await getUserById(userId)
-        const courses = await findCoursesByUserId(userId, role)
+router.get(
+    '/my',
+    passport.authenticate([USER_ROLES.STUDENT, USER_ROLES.INSTRUCTOR]),
+    async (req, res) => {
+        try {
+            const { jwt } = req.headers
+            const userId = await getUserIdFromToken(jwt)
+            const { role } = await getUserById(userId)
+            const courses = await findCoursesByUserId(userId, role)
 
-        const mappedCourses = courses.map(course => {
-            const { id, title, description, instructorIds, lessonsIds, startedIds, completedIds } = course
-            const isStarted = Boolean(startedIds.includes(userId))
-            const isCompleted = Boolean(completedIds.includes(userId))
+            const mappedCourses = courses.map((course) => {
+                const {
+                    id,
+                    title,
+                    description,
+                    instructorIds,
+                    lessonsIds,
+                    startedIds,
+                    completedIds,
+                } = course
+                const isStarted = Boolean(startedIds.includes(userId))
+                const isCompleted = Boolean(completedIds.includes(userId))
 
-            return {
-                id,
-                title,
-                description,
-                instructorIds,
-                lessonsIds,
-                isStarted,
-                isCompleted
-            }
-        })
+                return {
+                    id,
+                    title,
+                    description,
+                    instructorIds,
+                    lessonsIds,
+                    isStarted,
+                    isCompleted,
+                }
+            })
 
-        res.json({ courses: mappedCourses })
-    } catch {
-        res.status(400).json({ message: 'Cannot get courses' })
+            // TODO: Add status if student passed the course, mark and feedback
+
+            res.json({ courses: mappedCourses })
+        } catch {
+            res.status(400).json({ message: 'Cannot get courses' })
+        }
     }
-})
+)
 
 router.get('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
