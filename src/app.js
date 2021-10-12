@@ -5,6 +5,8 @@ import cors from 'cors'
 import appRoutes from './routes/app.routes'
 import users from './routes/users.routes'
 import courses from './routes/courses.routes'
+import lessons from './routes/lessons.routes'
+import files from './routes/files.routes'
 import passport from 'passport'
 
 export function createExpressApp() {
@@ -26,6 +28,8 @@ export function createExpressApp() {
     app.use('/', appRoutes)
     app.use('/users', users)
     app.use('/courses', courses)
+    app.use('/lessons', lessons)
+    app.use('/files', files)
 
     return app
 }
