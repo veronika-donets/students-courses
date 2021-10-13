@@ -16,4 +16,5 @@ export const VALIDATION_REGEX = Object.freeze({
     LAST_NAME: /^[-,a-z. ']{2,50}$/i,
     EMAIL: /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,6}$/i,
     PASSWORD: /^(?=.*[a-z])(?=.*\d)[a-z\d]{8,60}$/i,
+    MARK: /^[0-9]$|^[1-9][0-9]$|^(100)$/,
 })

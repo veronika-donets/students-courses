@@ -7,6 +7,7 @@ import users from './routes/users.routes'
 import courses from './routes/courses.routes'
 import lessons from './routes/lessons.routes'
 import files from './routes/files.routes'
+import homeworks from './routes/homeworks.routes'
 import passport from 'passport'
 
 export function createExpressApp() {
@@ -30,6 +31,7 @@ export function createExpressApp() {
     app.use('/courses', courses)
     app.use('/lessons', lessons)
     app.use('/files', files)
+    app.use('/homeworks', homeworks)
 
     return app
 }

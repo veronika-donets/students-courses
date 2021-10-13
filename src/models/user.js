@@ -166,26 +166,6 @@ export const updateIsEmailVerified = (id, isEmailVerified) => {
     return User.update({ isEmailVerified }, { where: { id } })
 }
 
-export const resetPassword = async (id, password) => {
-    try {
-        const user = await getUserById(id)
-
-        if (!user) {
-            throw new Error('User not found')
-        }
-
-        const updatedUser = await updatePassword(id, password)
-
-        if (!updatedUser) {
-            throw new Error('Cannot update user')
-        }
-
-        return updatedUser
-    } catch (e) {
-        throw new Error(e)
-    }
-}
-
 export const updateUserRole = (id, newRole) => {
     const role = newRole ? newRole.toUpperCase() : ''
     const isRoleExists = Object.values(USER_ROLES).some((el) => el === role)

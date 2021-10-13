@@ -7,8 +7,8 @@ import {
     getUserById,
     getUserIdFromToken,
     removeUser,
-    resetPassword,
     updateIsEmailVerified,
+    updatePassword,
     updateUserRole,
 } from '../models/user'
 import { sendResetPassEmail, sendVerificationEmail } from '../services/email.service'
@@ -100,21 +100,19 @@ router.post('/set-password', async (req, res) => {
             return res.status(403).json({ message: 'User token is not provided' })
         }
 
-        const { data } = jwt_decode(token)
+        const decoded = jwt_decode(token)
+        const { id } = decoded.data
+        const user = await getUserById(id)
 
-        if (data) {
-            const { id } = data
-
-            const user = await resetPassword(id, password)
-
-            if (!user) {
-                return res.status(403).json({ message: 'Reset password failed' })
-            }
-
-            res.json({ message: 'Reset password success' })
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' })
         }
+
+        await updatePassword(id, password)
+
+        res.json({ message: 'Reset password success' })
     } catch (e) {
-        res.status(403).json({ message: 'Reset password failed' })
+        res.status(400).json({ message: 'Reset password failed' })
     }
 })
 
