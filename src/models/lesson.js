@@ -10,6 +10,16 @@ export const Lesson = LessonModel.init(
             primaryKey: true,
             defaultValue: Sequelize.UUIDV4,
         },
+        courseId: {
+            type: Sequelize.UUID,
+            allowNull: false,
+            validate: {
+                notEmpty: {
+                    args: true,
+                    msg: 'Course id should not be empty',
+                },
+            },
+        },
         title: {
             type: Sequelize.STRING,
             allowNull: false,
@@ -31,6 +41,10 @@ export const Lesson = LessonModel.init(
             type: Sequelize.ARRAY(Sequelize.UUID),
             defaultValue: [],
         },
+        homeworkIds: {
+            type: Sequelize.ARRAY(Sequelize.UUID),
+            defaultValue: [],
+        },
     },
     {
         modelName: 'Lessons',
@@ -49,6 +63,32 @@ export const getLessonByTitle = (title) => {
     return Lesson.findOne({ where: { title } })
 }
 
-export const createLesson = (title, description, uploadedFileIds) => {
-    return Lesson.create({ title, description, uploadedFileIds })
+export const createLesson = (courseId, title, description, uploadedFileIds) => {
+    return Lesson.create({ courseId, title, description, uploadedFileIds })
+}
+
+export const updateLesson = (id, title, description, uploadedFileIds) => {
+    return Lesson.update({ title, description, uploadedFileIds }, { where: { id } })
+}
+
+export const removeLesson = (id) => {
+    return Lesson.destroy({ where: { id } })
+}
+
+export const addHomeworkIdToLesson = (id, homeworkId) => {
+    return Lesson.update(
+        {
+            homeworkIds: sequelize.fn('array_append', sequelize.col('homeworkIds'), homeworkId),
+        },
+        { where: { id } }
+    )
+}
+
+export const removeHomeworkIdFromLesson = (id, homeworkId) => {
+    return Lesson.update(
+        {
+            homeworkIds: sequelize.fn('array_remove', sequelize.col('homeworkIds'), homeworkId),
+        },
+        { where: { id } }
+    )
 }

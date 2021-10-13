@@ -95,21 +95,21 @@ export const unassignInstructorFromCourse = (courseId, instructorId) => {
     )
 }
 
-export const startCourse = (courseId, studentId) => {
+export const startCourse = (id, studentId) => {
     return Course.update(
         {
             startedIds: sequelize.fn('array_append', sequelize.col('startedIds'), studentId),
         },
-        { where: { id: courseId } }
+        { where: { id } }
     )
 }
 
-export const removeCourseFromStarted = (courseId, studentId) => {
+export const removeCourseFromStarted = (id, studentId) => {
     return Course.update(
         {
             startedIds: sequelize.fn('array_remove', sequelize.col('startedIds'), studentId),
         },
-        { where: { id: courseId } }
+        { where: { id } }
     )
 }
 
@@ -208,4 +208,22 @@ export const findCoursesByUserId = (id, role) => {
         ],
         ...filter,
     })
+}
+
+export const addLessonIdToCourse = (id, lessonId) => {
+    return Course.update(
+        {
+            lessonsIds: sequelize.fn('array_append', sequelize.col('lessonsIds'), lessonId),
+        },
+        { where: { id } }
+    )
+}
+
+export const removeLessonIdFromCourse = (id, studentId) => {
+    return Course.update(
+        {
+            lessonsIds: sequelize.fn('array_remove', sequelize.col('startedIds'), studentId),
+        },
+        { where: { id } }
+    )
 }
