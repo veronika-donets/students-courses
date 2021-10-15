@@ -65,6 +65,16 @@ export const getCourseById = (id) => {
     return Course.findOne({ where: { id } })
 }
 
+export const getCourseByLessonId = (id) => {
+    return Course.findOne({
+        where: {
+            lessonsIds: {
+                [Sequelize.Op.contains]: [id]
+            }
+        }
+    })
+}
+
 export const createCourse = ({ title, description }) => {
     return Course.create({ title, description })
 }

@@ -2,13 +2,14 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import cors from 'cors'
+import passport from 'passport'
 import appRoutes from './routes/app.routes'
 import users from './routes/users.routes'
 import courses from './routes/courses.routes'
 import lessons from './routes/lessons.routes'
 import files from './routes/files.routes'
 import homeworks from './routes/homeworks.routes'
-import passport from 'passport'
+import results from './routes/results.routes'
 
 export function createExpressApp() {
     const app = express()
@@ -32,6 +33,7 @@ export function createExpressApp() {
     app.use('/lessons', lessons)
     app.use('/files', files)
     app.use('/homeworks', homeworks)
+    app.use('/results', results)
 
     return app
 }

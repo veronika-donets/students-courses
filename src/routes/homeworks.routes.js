@@ -11,10 +11,12 @@ import {
     putMark,
     removeHomework,
     removeMark,
-    updateHomework,
+    updateHomework, findHomeworksByLessonIds,
 } from '../models/homework'
 import { addHomeworkIdToLesson, getLessonById, removeHomeworkIdFromLesson } from '../models/lesson'
 import Lodash from 'lodash'
+import { getCourseByLessonId } from '../models/course'
+import { getResultByCredentials, updateFinalMark } from '../models/result'
 
 const router = Router()
 const upload = multer({ dest: 'uploads/' })
@@ -174,8 +176,6 @@ router.put(
     '/mark',
     passport.authenticate([USER_ROLES.INSTRUCTOR, USER_ROLES.ADMIN]),
     async (req, res) => {
-        // The endpoint supports to upload maximum 10 files
-
         try {
             const { homeworkId, mark } = req.body
 
@@ -195,8 +195,38 @@ router.put(
 
             await putMark(homeworkId, mark)
 
+
+            const { lessonId, studentId } = homework
+
+            const { lessonsIds, id: courseId } = await getCourseByLessonId(lessonId)
+            const homeworks = await findHomeworksByLessonIds(lessonsIds, studentId)
+
+            const marks = homeworks.filter(el => el.mark).map(el => el.mark)
+            console.log('marks', marks)
+            let isAllHomeworkSubmitted = false
+            let isCoursePassed = false
+            let finalMark = null
+
+            if (lessonsIds.length === marks.length) {
+                isAllHomeworkSubmitted = true
+                console.log('mark', Lodash.sum(marks) / marks.length)
+                finalMark = Math.round(Lodash.sum(marks) / marks.length)
+                isCoursePassed = finalMark >= 80
+
+                const result = await getResultByCredentials(courseId, studentId)
+
+                if (!result) {
+                    return res.status(404).json({ message: 'Course result not found'})
+                }
+
+                await updateFinalMark(result.id, finalMark, isCoursePassed)
+            }
+
             res.json({
                 message: 'The mark has been given',
+                isAllHomeworkSubmitted,
+                isCoursePassed,
+                finalMark
             })
         } catch (e) {
             res.status(400).json({ message: e.message })

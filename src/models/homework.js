@@ -94,3 +94,12 @@ export const removeHomeworkWithFiles = async (id) => {
     }
     return Homework.destroy({ where: { id } })
 }
+
+export const findHomeworksByLessonIds = (lessonsIds, studentId) => {
+    return Homework.findAll({
+        where: {
+            studentId,
+            lessonId: lessonsIds,
+        },
+    })
+}
