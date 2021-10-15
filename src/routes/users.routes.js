@@ -20,7 +20,14 @@ const router = Router()
 
 router.post('/register', async (req, res) => {
     try {
-        const { id, firstName, lastName, email, isEmailVerified, role } = await createUser(req.body)
+        const {
+            id,
+            firstName,
+            lastName,
+            email,
+            isEmailVerified,
+            role,
+        } = await createUser(req.body)
 
         const user = {
             id,
@@ -35,7 +42,12 @@ router.post('/register', async (req, res) => {
         const token = await generateAuthToken({ id })
         await sendVerificationEmail(email, token)
 
-        res.json({ user })
+        res.json({
+            user: {
+                token,
+                ...user,
+            },
+        })
     } catch (e) {
         res.status(400).json({ message: e.message })
     }
@@ -44,19 +56,27 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email: userEmail, password } = req.body
-        const { id, email, isEmailVerified, firstName, lastName, role } =
-            await getUserByCredentials(userEmail, password)
-
-        const token = await generateAuthToken({ id })
-
-        res.json({
-            token,
+        const {
             id,
             email,
             isEmailVerified,
             firstName,
             lastName,
             role,
+        } = await getUserByCredentials(userEmail, password)
+
+        const token = await generateAuthToken({ id })
+
+        res.json({
+            user: {
+                token,
+                id,
+                email,
+                isEmailVerified,
+                firstName,
+                lastName,
+                role,
+            },
         })
     } catch {
         res.status(401).json({ message: 'Login failed. Please check email/password and try again' })
@@ -223,7 +243,7 @@ router.post('/token', async (req, res) => {
 
         res.status(200).json({ token })
     } catch (e) {
-        res.status(403).json({ message: 'Sending email verification failed' })
+        res.status(400).json({ message: 'Sending email verification failed' })
     }
 })
 
@@ -250,6 +270,71 @@ router.delete('/remove', passport.authenticate([USER_ROLES.ADMIN]), async (req, 
         res.json({ message: 'User removed' })
     } catch (e) {
         res.status(400).json({ message: 'Cannot remove user' })
+    }
+})
+
+router.get(
+    '/me',
+    passport.authenticate([USER_ROLES.STUDENT, USER_ROLES.INSTRUCTOR, USER_ROLES.ADMIN]),
+    async (req, res) => {
+        try {
+            const { jwt } = req.headers
+
+            const userId = await getUserIdFromToken(jwt)
+            const user = await getUserById(userId)
+
+            const {
+                id,
+                firstName,
+                lastName,
+                email,
+                isEmailVerified,
+                role,
+            } = user
+
+            res.json({
+                user: {
+                    id,
+                    firstName,
+                    lastName,
+                    email,
+                    isEmailVerified,
+                    role,
+                },
+            })
+        } catch {
+            res.status(400).json({ message: 'Cannot get user' })
+        }
+    }
+)
+
+router.get('/:id', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+    try {
+        const { id: userId } = req.params
+
+        const user = await getUserById(userId)
+
+        const {
+            id,
+            firstName,
+            lastName,
+            email,
+            isEmailVerified,
+            role,
+        } = user
+
+        res.json({
+            user: {
+                id,
+                firstName,
+                lastName,
+                email,
+                isEmailVerified,
+                role,
+            },
+        })
+    } catch {
+        res.status(400).json({ message: 'Cannot get user' })
     }
 })
 

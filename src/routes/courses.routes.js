@@ -3,7 +3,6 @@ import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
 import {
     assignInstructorToCourse,
-    completeCourse,
     createCourse,
     findAvailableCourses,
     findCoursesByUserId,
@@ -12,8 +11,12 @@ import {
     startCourse,
     unassignInstructorFromCourse,
 } from '../models/course'
-import { getUserById, getUserIdFromToken } from '../models/user'
+import {
+    getUserById,
+    getUserIdFromToken,
+} from '../models/user'
 import Lodash from 'lodash'
+import { createResult } from '../models/result'
 
 const router = Router()
 
@@ -147,11 +150,8 @@ router.post('/start', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
             return res.status(400).json({ message: 'Course is already started' })
         }
 
-        const result = await startCourse(courseId, studentId)
-
-        if (!result) {
-            return res.status(400).json({ message: 'Cannot start course' })
-        }
+        await startCourse(courseId, studentId)
+        await createResult(courseId, studentId)
 
         res.json({ message: 'Course successfully started' })
     } catch {
@@ -159,45 +159,47 @@ router.post('/start', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
     }
 })
 
-router.post('/complete', passport.authenticate([USER_ROLES.STUDENT]), async (req, res) => {
-    try {
-        const { jwt } = req.headers
-        const { courseId } = req.body
-
-        if (!courseId) {
-            return res.status(400).json({ message: 'Course id is not provided' })
-        }
-
-        const studentId = await getUserIdFromToken(jwt)
-
-        if (!studentId) {
-            return res.status(404).json({ message: 'Student not found' })
-        }
-
-        const course = await getCourseById(courseId)
-
-        if (!course) {
-            return res.status(404).json({ message: 'Course not found' })
-        }
-
-        const isStarted = course.startedIds.includes(studentId)
-
-        if (!isStarted) {
-            return res.status(400).json({ message: 'Course is not started' })
-        }
-
-        //TODO: Check if all lessons completed, generate final mark.
-        const result = await completeCourse(courseId, studentId)
-
-        if (!result) {
-            return res.status(400).json({ message: 'Cannot complete course' })
-        }
-
-        res.json({ message: 'Course successfully completed' })
-    } catch {
-        res.status(400).json({ message: 'Cannot complete course' })
-    }
-})
+// router.post('/complete', passport.authenticate([USER_ROLES.STUDENT]), async (req, res) => {
+//     try {
+//         const { jwt } = req.headers
+//         const { courseId } = req.body
+//
+//         if (!courseId) {
+//             return res.status(400).json({ message: 'Course id is not provided' })
+//         }
+//
+//         const studentId = await getUserIdFromToken(jwt)
+//
+//         if (!studentId) {
+//             return res.status(404).json({ message: 'Student not found' })
+//         }
+//
+//         const course = await getCourseById(courseId)
+//
+//         if (!course) {
+//             return res.status(404).json({ message: 'Course not found' })
+//         }
+//
+//         const isStarted = course.startedIds.includes(studentId)
+//
+//         if (!isStarted) {
+//             return res.status(400).json({ message: 'Course is not started' })
+//         }
+//
+//         const lessons = await Promise.all(
+//             course.lessonsIds.map((id) => getHomeworkByCredentials(id, studentId))
+//         )
+//         console.log('lessons', lessons)
+//
+//         //TODO: Check if all lessons completed, generate final mark.
+//         await completeCourse(courseId, studentId)
+//         await moveCourseToCompleted(courseId, studentId)
+//
+//         res.json({ message: 'Course successfully completed' })
+//     } catch {
+//         res.status(400).json({ message: 'Cannot complete course' })
+//     }
+// })
 
 router.get('/available', async (req, res) => {
     // For admin all courses is available
@@ -268,10 +270,5 @@ router.get(
         }
     }
 )
-
-router.get('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
-    try {
-    } catch {}
-})
 
 export default router
