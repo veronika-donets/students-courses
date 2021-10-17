@@ -1,8 +1,9 @@
-import { sequelize } from '../db.js'
+import { sequelize } from '../db/db.js'
 import Sequelize from 'sequelize'
 import { VALIDATION_REGEX } from '../helpers'
 import Lodash from 'lodash'
-import { removeFile } from './file'
+import { File, removeFiles } from './file'
+import { Lesson } from './lesson'
 
 class HomeworkModel extends Sequelize.Model {}
 
@@ -36,10 +37,6 @@ export const Homework = HomeworkModel.init(
         comment: {
             type: Sequelize.STRING,
         },
-        uploadedFileIds: {
-            type: Sequelize.ARRAY(Sequelize.UUID),
-            defaultValue: [],
-        },
         mark: {
             type: Sequelize.INTEGER,
             validate: {
@@ -59,47 +56,64 @@ export const Homework = HomeworkModel.init(
     await sequelize.sync()
 })()
 
-export const getHomeworkById = (id) => {
-    return Homework.findOne({ where: { id } })
+export const getHomeworkWithFilesById = (id) => {
+    return Homework.findOne({
+        where: { id },
+        attributes: ['id', 'lessonId', 'studentId', 'comment', 'mark'],
+        include: [
+            {
+                model: File,
+                attributes: ['id'],
+                required: false,
+            },
+        ],
+    })
 }
 
-export const getHomeworkByCredentials = (lessonId, studentId) => {
-    return Homework.findOne({ where: { lessonId, studentId } })
+export const getHomeworkWithLessonById = (id) => {
+    return Homework.findOne({
+        where: { id },
+        attributes: ['id', 'lessonId', 'studentId', 'comment', 'mark'],
+        include: [
+            {
+                model: Lesson,
+                attributes: ['courseId'],
+                required: false,
+            },
+        ],
+    })
 }
 
-export const createHomework = (lessonId, studentId, uploadedFileIds, comment) => {
-    return Homework.create({ lessonId, studentId, uploadedFileIds, comment })
+export const getAllHomeworksPerCourse = (lessonIds, studentId) => {
+    return Homework.findAll({
+        where: { lessonId: lessonIds, studentId },
+        attributes: ['id', 'lessonId', 'studentId', 'comment', 'mark'],
+    })
 }
 
-export const updateHomework = (id, uploadedFileIds, comment) => {
-    return Homework.update({ uploadedFileIds, comment }, { where: { id } })
+export const createHomework = (lessonId, studentId, comment) => {
+    return Homework.create({ lessonId, studentId, comment })
+}
+
+export const updateHomework = (id, comment) => {
+    return Homework.update({ comment }, { where: { id } })
 }
 
 export const putMark = (id, mark) => {
     return Homework.update({ mark }, { where: { id } })
 }
 
-export const removeMark = (id) => {
-    return Homework.update({ mark: null }, { where: { id } })
-}
-
 export const removeHomework = (id) => {
     return Homework.destroy({ where: { id } })
 }
 
-export const removeHomeworkWithFiles = async (id) => {
-    const { uploadedFileIds } = await getHomeworkById(id)
-    if (!Lodash.isEmpty(uploadedFileIds)) {
-        await Promise.all(uploadedFileIds.map((id) => removeFile(id)))
-    }
-    return Homework.destroy({ where: { id } })
-}
+export const removeHomeworksWithContains = async (homeworks) => {
+    if (Lodash.isEmpty(homeworks)) return
 
-export const findHomeworksByLessonIds = (lessonsIds, studentId) => {
-    return Homework.findAll({
-        where: {
-            studentId,
-            lessonId: lessonsIds,
-        },
-    })
+    const homeworkIds = homeworks.map((el) => el.id)
+    const homeworkFileIds = homeworks.map((el) => el.Files.map((file) => file.id)).flat(1)
+
+    await removeFiles(homeworkFileIds)
+
+    return Homework.destroy({ where: { id: homeworkIds } })
 }

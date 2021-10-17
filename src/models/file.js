@@ -1,4 +1,4 @@
-import { sequelize } from '../db.js'
+import { sequelize } from '../db/db.js'
 import Sequelize from 'sequelize'
 import fs from 'fs'
 import path from 'path'
@@ -15,8 +15,8 @@ export const File = FilesModel.init(
         originalname: {
             type: Sequelize.STRING,
         },
-        encoding: {
-            type: Sequelize.STRING,
+        sourceId: {
+            type: Sequelize.UUID,
         },
         mimetype: {
             type: Sequelize.STRING,
@@ -45,12 +45,12 @@ export const getFileById = (id) => {
     return File.findOne({ where: { id } })
 }
 
-export const createUploadedFile = ({ originalname, encoding, mimetype, filename, path, size }) => {
+export const createUploadedFile = (sourceId, { originalname, mimetype, filename, path, size }) => {
     const data = fs.readFileSync(path)
 
     return File.create({
+        sourceId,
         originalname,
-        encoding,
         mimetype,
         filename,
         data,
@@ -58,8 +58,8 @@ export const createUploadedFile = ({ originalname, encoding, mimetype, filename,
     })
 }
 
-export const removeFile = (id) => {
-    return File.destroy({ where: { id } })
+export const removeFiles = (ids) => {
+    return File.destroy({ where: { id: [...ids] } })
 }
 
 export const cleanUploadsFolder = (files) => {

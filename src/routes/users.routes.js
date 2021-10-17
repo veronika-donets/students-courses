@@ -20,14 +20,7 @@ const router = Router()
 
 router.post('/register', async (req, res) => {
     try {
-        const {
-            id,
-            firstName,
-            lastName,
-            email,
-            isEmailVerified,
-            role,
-        } = await createUser(req.body)
+        const { id, firstName, lastName, email, isEmailVerified, role } = await createUser(req.body)
 
         const user = {
             id,
@@ -56,14 +49,8 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email: userEmail, password } = req.body
-        const {
-            id,
-            email,
-            isEmailVerified,
-            firstName,
-            lastName,
-            role,
-        } = await getUserByCredentials(userEmail, password)
+        const { id, email, isEmailVerified, firstName, lastName, role } =
+            await getUserByCredentials(userEmail, password)
 
         const token = await generateAuthToken({ id })
 
@@ -205,6 +192,8 @@ router.post('/verify/email/confirm', async (req, res) => {
 router.put('/role', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
         const { id, role } = req.body
+        const { jwt } = req.headers
+        const userId = await getUserIdFromToken(jwt)
 
         if (!id || !role) {
             return res.status(400).json({ message: 'User id or role is not provided' })
@@ -216,11 +205,11 @@ router.put('/role', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) 
             return res.status(404).json({ message: 'User not found' })
         }
 
-        const result = await updateUserRole(id, role)
-
-        if (!result) {
-            return res.status(400).json({ message: 'Update user role failed' })
+        if (user.id === userId) {
+            return res.status(400).json({ message: 'User cannot update own role' })
         }
+
+        await updateUserRole(id, role)
 
         res.json({ message: 'Update user role success' })
     } catch (e) {
@@ -283,14 +272,7 @@ router.get(
             const userId = await getUserIdFromToken(jwt)
             const user = await getUserById(userId)
 
-            const {
-                id,
-                firstName,
-                lastName,
-                email,
-                isEmailVerified,
-                role,
-            } = user
+            const { id, firstName, lastName, email, isEmailVerified, role } = user
 
             res.json({
                 user: {
@@ -308,20 +290,13 @@ router.get(
     }
 )
 
-router.get('/:id', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+router.get('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
-        const { id: userId } = req.params
+        const { id: userId } = req.query
 
         const user = await getUserById(userId)
 
-        const {
-            id,
-            firstName,
-            lastName,
-            email,
-            isEmailVerified,
-            role,
-        } = user
+        const { id, firstName, lastName, email, isEmailVerified, role } = user
 
         res.json({
             user: {

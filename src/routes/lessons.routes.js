@@ -3,16 +3,16 @@ import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
 import {
     createLesson,
-    getLessonById,
-    getLessonByTitle,
-    removeLesson,
+    getLessonWithFilesById,
+    getLessonWithFiles,
     updateLesson,
+    removeLessonsWithContains,
 } from '../models/lesson'
 import multer from 'multer'
-import { cleanUploadsFolder, createUploadedFile } from '../models/file'
-import { addLessonIdToCourse, getCourseById, removeLessonIdFromCourse } from '../models/course'
-import { removeHomeworkWithFiles } from '../models/homework'
+import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../models/file'
+import { getCourseById } from '../models/course'
 import Lodash from 'lodash'
+import { getUserById, getUserIdFromToken, findLessonInProgressCourses } from '../models/user'
 
 const router = Router()
 const upload = multer({ dest: 'uploads/' })
@@ -32,34 +32,24 @@ router.post(
             } = req.body
             const { files } = req
 
-            const existingLesson = await getLessonByTitle(lessonTitle)
-
-            if (existingLesson) {
-                return res
-                    .status(400)
-                    .json({ message: 'Lesson with the same title already exists' })
-            }
-
-            const createdFiles = await Promise.all(files.map((file) => createUploadedFile(file)))
-
-            const fileIds = createdFiles.map((file) => file.id)
-
             const course = await getCourseById(identifier)
 
             if (!course) {
                 return res.status(404).json({ message: 'Course not found' })
             }
 
-            const { id, courseId, title, description, uploadedFileIds } = await createLesson(
+            const { id, courseId, title, description } = await createLesson(
                 identifier,
                 lessonTitle,
-                lessonDescription,
-                fileIds
+                lessonDescription
             )
 
-            await addLessonIdToCourse(courseId, id)
+            const createdFiles = await Promise.all(
+                files.map((file) => createUploadedFile(id, file))
+            )
+            const fileIds = createdFiles.map((file) => file.id)
 
-            res.json({ id, courseId, title, description, uploadedFileIds })
+            res.json({ id, courseId, title, description, fileIds })
         } catch (e) {
             res.status(400).json({ message: e.message })
         } finally {
@@ -68,7 +58,42 @@ router.post(
     }
 )
 
-router.post(
+router.get(
+    '/',
+    passport.authenticate([USER_ROLES.ADMIN, USER_ROLES.INSTRUCTOR, USER_ROLES.STUDENT]),
+    async (req, res) => {
+        try {
+            const { id } = req.query
+            const { jwt } = req.headers
+
+            const userId = await getUserIdFromToken(jwt)
+            const user = await getUserById(userId)
+
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' })
+            }
+
+            if (user.role === USER_ROLES.STUDENT) {
+                const result = await findLessonInProgressCourses(userId, id)
+                const mapped = result.map((el) => el.Course).filter((el) => el !== null)
+
+                if (Lodash.isEmpty(mapped)) {
+                    return res
+                        .status(403)
+                        .json({ message: 'You are not authorized to see this lesson' })
+                }
+            }
+
+            const lesson = await getLessonWithFilesById(id)
+
+            res.json({ lesson })
+        } catch {
+            res.status(400).json({ message: 'Cannot get lesson' })
+        }
+    }
+)
+
+router.put(
     '/update',
     passport.authenticate([USER_ROLES.ADMIN]),
     upload.array('file', 10),
@@ -83,17 +108,20 @@ router.post(
                 return res.status(404).json({ message: 'Lesson id is not provided' })
             }
 
-            const lesson = await getLessonById(id)
+            const lesson = await getLessonWithFilesById(id)
 
             if (!lesson) {
                 return res.status(404).json({ message: 'Lesson not found' })
             }
 
-            const createdFiles = await Promise.all(files.map((file) => createUploadedFile(file)))
+            await updateLesson(id, title, description)
 
-            const fileIds = createdFiles.map((file) => file.id)
+            if (!Lodash.isEmpty(files)) {
+                await Promise.all(files.map((file) => createUploadedFile(id, file)))
 
-            await updateLesson(id, title, description, fileIds)
+                const uploadedFileIds = lesson.Files.map((el) => el.id)
+                await removeFiles(uploadedFileIds)
+            }
 
             res.json({ message: 'Lesson successfully updated' })
         } catch (e) {
@@ -104,36 +132,25 @@ router.post(
     }
 )
 
-router.delete('/:id', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.query
 
         if (!id) {
             return res.status(400).json({ message: 'Lesson id is not provided' })
         }
 
-        const lesson = await getLessonById(id)
+        const lesson = await getLessonWithFiles(id)
 
         if (!lesson) {
             return res.status(404).json({ message: 'Lesson not found' })
         }
 
-        const { homeworkIds, courseId } = lesson
+        await removeLessonsWithContains([lesson])
 
-        if (!Lodash.isEmpty(homeworkIds)) {
-            await Promise.all(homeworkIds.map((id) => removeHomeworkWithFiles(id)))
-        }
-
-        const { lessonsIds } = await getCourseById(courseId)
-        await Promise.all(lessonsIds.map((id) => removeLessonIdFromCourse(id)))
-
-        await removeLesson(id)
-
-        res.json({
-            message: 'Lesson has been removed',
-        })
+        res.json({ message: 'Lesson has been successfully removed' })
     } catch {
-        res.status(400).json({ message: 'Cannot remove homework' })
+        res.status(400).json({ message: 'Cannot remove lesson' })
     }
 })
 
