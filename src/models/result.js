@@ -1,6 +1,8 @@
 import { sequelize } from '../db/db.js'
 import Sequelize from 'sequelize'
 import { User } from './user'
+import Lodash from 'lodash'
+import { Homework } from './homework'
 
 class ResultModel extends Sequelize.Model {}
 
@@ -83,4 +85,12 @@ export const getStudentsPerCourse = (courseId) => {
             },
         ],
     })
+}
+
+export const removeResults = async (results) => {
+    if (Lodash.isEmpty(results)) return
+
+    const resultIds = results.map((el) => el.id)
+
+    return Homework.destroy({ where: { id: resultIds } })
 }

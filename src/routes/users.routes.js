@@ -3,10 +3,10 @@ import {
     createUser,
     generateAuthToken,
     getUserByCredentials,
-    getUserByEmail,
+    getUserByEmail, getUserByEmailWithContains,
     getUserById,
     getUserIdFromToken,
-    removeUser,
+    removeUserWithRelations,
     updateIsEmailVerified,
     updatePassword,
     updateUserRole,
@@ -15,6 +15,7 @@ import { sendResetPassEmail, sendVerificationEmail } from '../services/email.ser
 import jwt_decode from 'jwt-decode'
 import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
+import { getCoursesByInstructorId, unassignInstructorFromAllCourses } from '../models/course'
 
 const router = Router()
 
@@ -236,27 +237,32 @@ router.post('/token', async (req, res) => {
     }
 })
 
-router.delete('/remove', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
-        const { email } = req.body
+        const { email } = req.query
 
         if (!email) {
             return res.status(400).json({ message: 'User email is not provided' })
         }
 
-        const user = await getUserByEmail(email)
+        const user = await getUserByEmailWithContains(email)
 
-        if (user.role === USER_ROLES.ADMIN) {
+        const { id, role } = user
+
+        if (role === USER_ROLES.ADMIN) {
             return res.status(400).json({ message: 'Admin user cannot be removed' })
         }
 
-        const result = await removeUser(email)
+        if (role === USER_ROLES.INSTRUCTOR) {
+            const courses = await getCoursesByInstructorId(id)
+            const courseIds = courses.map(el => el.id)
 
-        if (!result) {
-            return res.status(400).json({ message: 'Cannot remove user' })
+            await unassignInstructorFromAllCourses(courseIds, id)
         }
 
-        res.json({ message: 'User removed' })
+        await removeUserWithRelations(user)
+
+        res.json({ message: 'User has been successfully removed' })
     } catch (e) {
         res.status(400).json({ message: 'Cannot remove user' })
     }

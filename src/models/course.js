@@ -138,6 +138,19 @@ export const unassignInstructorFromCourse = (courseId, instructorId) => {
     )
 }
 
+export const unassignInstructorFromAllCourses = (courseIds, instructorId) => {
+    return Course.update(
+        {
+            instructorIds: sequelize.fn(
+                'array_remove',
+                sequelize.col('instructorIds'),
+                instructorId
+            ),
+        },
+        { where: { id: courseIds } }
+    )
+}
+
 export const findAvailableCourses = async (limit, offset, isActive = true) => {
     const filter = isActive
         ? {
@@ -206,4 +219,15 @@ export const removeCourseWithContains = async (course) => {
     }
 
     return Course.destroy({ where: { id } })
+}
+
+export const getCoursesByInstructorId = (id) => {
+    return Course.findAll({
+        where: {
+            instructorIds: {
+                [Sequelize.Op.contains]: [id]
+            }
+        },
+        attributes: ['id'],
+    })
 }

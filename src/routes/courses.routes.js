@@ -249,7 +249,7 @@ router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) =
         const course = await getCourseWithContains(id)
 
         if (!course) {
-            res.status(404).json({ message: 'Course not found' })
+            return res.status(404).json({ message: 'Course not found' })
         }
 
         await removeCourseWithContains(course)
