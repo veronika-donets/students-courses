@@ -2,21 +2,21 @@ import { Router } from 'express'
 import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
 import multer from 'multer'
-import { cleanUploadsFolder, createUploadedFile, removeFile } from '../models/file'
+import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../models/file'
 import { getUserById, getUserIdFromToken } from '../models/user'
 import {
     createHomework,
-    getHomeworkById,
-    getHomeworkByCredentials,
     putMark,
-    removeHomework,
-    removeMark,
-    updateHomework, findHomeworksByLessonIds,
+    updateHomework,
+    getHomeworkWithFilesById,
+    getHomeworkWithLessonById,
+    getAllHomeworksPerCourse,
+    removeHomeworksWithContains,
 } from '../models/homework'
-import { addHomeworkIdToLesson, getLessonById, removeHomeworkIdFromLesson } from '../models/lesson'
+import { getLessonWithHomeworkById } from '../models/lesson'
 import Lodash from 'lodash'
-import { getCourseByLessonId } from '../models/course'
 import { getResultByCredentials, updateFinalMark } from '../models/result'
+import { getCourseWithLessonsById } from '../models/course'
 
 const router = Router()
 const upload = multer({ dest: 'uploads/' })
@@ -43,34 +43,40 @@ router.post(
                 return res.status(404).json({ message: 'Student not found' })
             }
 
-            const lesson = await getLessonById(lessonId)
+            const lesson = await getLessonWithHomeworkById(lessonId, studentId)
 
             if (!lesson) {
-                return res.status(400).json({ message: 'Lesson with provided id is not exist' })
+                return res.status(404).json({ message: 'Lesson with provided id is not exist' })
             }
 
-            const existedHomework = await getHomeworkByCredentials(lessonId, studentId)
+            const isCourseInProgress = await getResultByCredentials(lesson.courseId, studentId)
 
-            if (existedHomework) {
+            if (!isCourseInProgress) {
+                return res
+                    .status(400)
+                    .json({ message: "You haven't started course with this lesson" })
+            }
+
+            if (!Lodash.isEmpty(lesson.Homeworks)) {
                 return res
                     .status(400)
                     .json({ message: 'You already have homework submitted to this lesson' })
             }
 
-            const createdFiles = await Promise.all(files.map((file) => createUploadedFile(file)))
+            const homework = await createHomework(lessonId, studentId, comment)
+
+            const createdFiles = await Promise.all(
+                files.map((file) => createUploadedFile(homework.id, file))
+            )
 
             const fileIds = createdFiles.map((file) => file.id)
-
-            const homework = await createHomework(lessonId, studentId, fileIds, comment)
-
-            await addHomeworkIdToLesson(lessonId, homework.id)
 
             res.json({
                 id: homework.id,
                 lessonId: homework.lessonId,
                 studentId: homework.studentId,
-                uploadedFileIds: homework.uploadedFileIds,
                 comment: homework.comment,
+                fileIds,
             })
         } catch (e) {
             res.status(400).json({ message: e.message })
@@ -80,46 +86,7 @@ router.post(
     }
 )
 
-router.get(
-    '/:id',
-    passport.authenticate([USER_ROLES.STUDENT, USER_ROLES.INSTRUCTOR, USER_ROLES.ADMIN]),
-    async (req, res) => {
-        try {
-            const { id: homeworkId } = req.params
-            const { jwt } = req.headers
-
-            if (!homeworkId) {
-                return res.status(400).json({ message: 'Homework id is not provided' })
-            }
-
-            const userId = await getUserIdFromToken(jwt)
-
-            if (!userId) {
-                return res.status(404).json({ message: 'User not found' })
-            }
-
-            const { role } = getUserById(userId)
-
-            const homework = await getHomeworkById(homeworkId)
-
-            if (!homework) {
-                return res.status(404).json({ message: 'Homework not found' })
-            }
-
-            if (role === USER_ROLES.STUDENT && homework.studentId !== userId) {
-                return res.status(401).json({ message: 'Unauthorized' })
-            }
-
-            const { id, lessonId, studentId, uploadedFileIds, comment, mark } = homework
-
-            res.json({ id, lessonId, studentId, uploadedFileIds, comment, mark })
-        } catch {
-            res.status(400).json({ message: 'Cannot get homework' })
-        }
-    }
-)
-
-router.post(
+router.put(
     '/update',
     passport.authenticate([USER_ROLES.STUDENT]),
     upload.array('file', 10),
@@ -141,7 +108,7 @@ router.post(
                 return res.status(404).json({ message: 'Student not found' })
             }
 
-            const existedHomework = await getHomeworkById(homeworkId)
+            const existedHomework = await getHomeworkWithFilesById(homeworkId)
 
             if (!existedHomework) {
                 return res.status(404).json({ message: 'Homework not found' })
@@ -151,23 +118,59 @@ router.post(
                 return res.status(401).json({ message: 'Unauthorized' })
             }
 
-            const createdFiles = await Promise.all(files.map((file) => createUploadedFile(file)))
+            await updateHomework(homeworkId, comment)
 
-            const fileIds = createdFiles.map((file) => file.id)
+            if (!Lodash.isEmpty(files)) {
+                await Promise.all(files.map((file) => createUploadedFile(homeworkId, file)))
 
-            await updateHomework(homeworkId, fileIds, comment)
+                const uploadedFileIds = existedHomework.Files.map((el) => el.id)
+                await removeFiles(uploadedFileIds)
+            }
 
             res.json({ message: 'Homework successfully updated' })
-
-            const { uploadedFileIds } = existedHomework
-
-            if (!Lodash.isEmpty(uploadedFileIds)) {
-                await Promise.all(uploadedFileIds.map((id) => removeFile(id)))
-            }
         } catch (e) {
             res.status(400).json({ message: e.message })
         } finally {
             await cleanUploadsFolder(req.files)
+        }
+    }
+)
+
+router.get(
+    '/',
+    passport.authenticate([USER_ROLES.STUDENT, USER_ROLES.INSTRUCTOR, USER_ROLES.ADMIN]),
+    async (req, res) => {
+        try {
+            const { id: homeworkId } = req.query
+            const { jwt } = req.headers
+
+            if (!homeworkId) {
+                return res.status(400).json({ message: 'Homework id is not provided' })
+            }
+
+            const userId = await getUserIdFromToken(jwt)
+
+            if (!userId) {
+                return res.status(404).json({ message: 'User not found' })
+            }
+
+            const { role } = getUserById(userId)
+
+            const homework = await getHomeworkWithFilesById(homeworkId)
+
+            if (!homework) {
+                return res.status(404).json({ message: 'Homework not found' })
+            }
+
+            if (role === USER_ROLES.STUDENT && homework.studentId !== userId) {
+                return res
+                    .status(403)
+                    .json({ message: 'You are not authorized to see this homework' })
+            }
+
+            res.json({ homework })
+        } catch {
+            res.status(400).json({ message: 'Cannot get homework' })
         }
     }
 )
@@ -187,7 +190,7 @@ router.put(
                 return res.status(400).json({ message: 'Mark is not provided' })
             }
 
-            const homework = await getHomeworkById(homeworkId)
+            const homework = await getHomeworkWithLessonById(homeworkId)
 
             if (!homework) {
                 return res.status(404).json({ message: 'Homework not found' })
@@ -195,28 +198,34 @@ router.put(
 
             await putMark(homeworkId, mark)
 
+            const { Lesson, studentId } = homework
 
-            const { lessonId, studentId } = homework
+            // Check if a student submit all homeworks to all lessons per course
 
-            const { lessonsIds, id: courseId } = await getCourseByLessonId(lessonId)
-            const homeworks = await findHomeworksByLessonIds(lessonsIds, studentId)
+            const { Lessons } = await getCourseWithLessonsById(Lesson.courseId)
 
-            const marks = homeworks.filter(el => el.mark).map(el => el.mark)
-            console.log('marks', marks)
+            const lessonIds = Lessons.map((el) => el.id)
+            const homeworks = await getAllHomeworksPerCourse(lessonIds, studentId)
+            const marks = homeworks.filter((el) => el.mark).map((el) => el.mark)
+
             let isAllHomeworkSubmitted = false
             let isCoursePassed = false
             let finalMark = null
 
-            if (lessonsIds.length === marks.length) {
+            if (lessonIds.length === homeworks.length) {
                 isAllHomeworkSubmitted = true
-                console.log('mark', Lodash.sum(marks) / marks.length)
+            }
+
+            // Check if all homeworks per course have marks. If yes, put final mark
+
+            if (lessonIds.length === marks.length) {
                 finalMark = Math.round(Lodash.sum(marks) / marks.length)
                 isCoursePassed = finalMark >= 80
 
-                const result = await getResultByCredentials(courseId, studentId)
+                const result = await getResultByCredentials(Lesson.courseId, studentId)
 
                 if (!result) {
-                    return res.status(404).json({ message: 'Course result not found'})
+                    return res.status(404).json({ message: 'Course result not found' })
                 }
 
                 await updateFinalMark(result.id, finalMark, isCoursePassed)
@@ -226,7 +235,7 @@ router.put(
                 message: 'The mark has been given',
                 isAllHomeworkSubmitted,
                 isCoursePassed,
-                finalMark
+                finalMark,
             })
         } catch (e) {
             res.status(400).json({ message: e.message })
@@ -234,37 +243,9 @@ router.put(
     }
 )
 
-router.delete(
-    '/mark',
-    passport.authenticate([USER_ROLES.INSTRUCTOR, USER_ROLES.ADMIN]),
-    async (req, res) => {
-        try {
-            const { homeworkId } = req.body
-
-            if (!homeworkId) {
-                return res.status(400).json({ message: 'Homework id is not provided' })
-            }
-
-            const homework = await getHomeworkById(homeworkId)
-
-            if (!homework) {
-                return res.status(404).json({ message: 'Homework not found' })
-            }
-
-            await removeMark(homeworkId)
-
-            res.json({
-                message: 'Mark has been deleted',
-            })
-        } catch (e) {
-            res.status(400).json({ message: e.message })
-        }
-    }
-)
-
-router.delete('/:id', passport.authenticate([USER_ROLES.STUDENT]), async (req, res) => {
+router.delete('/', passport.authenticate([USER_ROLES.STUDENT]), async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.query
         const { jwt } = req.headers
 
         if (!id) {
@@ -272,7 +253,7 @@ router.delete('/:id', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
         }
 
         const studentId = await getUserIdFromToken(jwt)
-        const homework = await getHomeworkById(id)
+        const homework = await getHomeworkWithFilesById(id)
 
         if (!homework) {
             return res.status(404).json({ message: 'Homework not found' })
@@ -282,15 +263,17 @@ router.delete('/:id', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
             return res.status(401).json({ message: 'Unauthorized' })
         }
 
-        await removeHomework(id)
-        await removeHomeworkIdFromLesson(homework.lessonId, id)
+        if (homework.mark) {
+            return res
+                .status(400)
+                .json({ message: 'Verified homework with mark cannot be removed' })
+        }
+
+        await removeHomeworksWithContains([homework])
 
         res.json({
-            message: 'Homework has been deleted',
+            message: 'Homework has been removed',
         })
-
-        const { uploadedFileIds } = homework
-        await Promise.all(uploadedFileIds.map((id) => removeFile(id)))
     } catch (e) {
         res.status(400).json({ message: 'Cannot remove homework' })
     }

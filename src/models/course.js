@@ -1,6 +1,10 @@
-import { sequelize } from '../db.js'
+import { sequelize } from '../db/db.js'
 import Sequelize from 'sequelize'
-import { USER_ROLES } from '../helpers'
+import { Lesson, removeLessonsWithContains } from './lesson'
+import { Result } from './result'
+import { Homework } from './homework'
+import { File } from './file'
+import Lodash from 'lodash'
 
 class CourseModel extends Sequelize.Model {}
 
@@ -39,18 +43,6 @@ export const Course = CourseModel.init(
             type: Sequelize.ARRAY(Sequelize.UUID),
             defaultValue: [],
         },
-        lessonsIds: {
-            type: Sequelize.ARRAY(Sequelize.UUID),
-            defaultValue: [],
-        },
-        startedIds: {
-            type: Sequelize.ARRAY(Sequelize.UUID),
-            defaultValue: [],
-        },
-        completedIds: {
-            type: Sequelize.ARRAY(Sequelize.UUID),
-            defaultValue: [],
-        },
     },
     {
         modelName: 'Courses',
@@ -65,18 +57,59 @@ export const getCourseById = (id) => {
     return Course.findOne({ where: { id } })
 }
 
-export const getCourseByLessonId = (id) => {
+export const getCourseWithLessonsById = (id) => {
     return Course.findOne({
-        where: {
-            lessonsIds: {
-                [Sequelize.Op.contains]: [id]
-            }
-        }
+        where: { id },
+        attributes: ['id', 'title', 'description', 'instructorIds'],
+        include: [
+            {
+                model: Lesson,
+                attributes: ['id', 'courseId', 'title', 'description'],
+                required: false,
+            },
+        ],
+    })
+}
+
+export const getCourseWithContains = (id) => {
+    return Course.findOne({
+        where: { id },
+        attributes: ['id'],
+        include: [
+            {
+                model: Lesson,
+                attributes: ['id'],
+                required: false,
+                include: [
+                    {
+                        model: Homework,
+                        attributes: ['id'],
+                        required: false,
+                        include: [
+                            {
+                                model: File,
+                                attributes: ['id'],
+                                required: false,
+                            },
+                        ],
+                    },
+                    {
+                        model: File,
+                        attributes: ['id'],
+                        required: false,
+                    },
+                ],
+            },
+        ],
     })
 }
 
 export const createCourse = ({ title, description }) => {
     return Course.create({ title, description })
+}
+
+export const updateCourse = (id, title, description) => {
+    return Course.update({ title, description }, { where: { id } })
 }
 
 export const assignInstructorToCourse = (courseId, instructorId) => {
@@ -105,135 +138,72 @@ export const unassignInstructorFromCourse = (courseId, instructorId) => {
     )
 }
 
-export const startCourse = (id, studentId) => {
-    return Course.update(
-        {
-            startedIds: sequelize.fn('array_append', sequelize.col('startedIds'), studentId),
-        },
-        { where: { id } }
-    )
-}
-
-export const removeCourseFromStarted = (id, studentId) => {
-    return Course.update(
-        {
-            startedIds: sequelize.fn('array_remove', sequelize.col('startedIds'), studentId),
-        },
-        { where: { id } }
-    )
-}
-
-export const completeCourse = async (courseId, studentId) => {
-    await removeCourseFromStarted(courseId, studentId)
-
-    return Course.update(
-        {
-            completedIds: sequelize.fn('array_append', sequelize.col('completedIds'), studentId),
-        },
-        { where: { id: courseId } }
-    )
-}
-
-export const findStartedCourses = async (studentId) => {
-    return Course.findAll({
-        where: {
-            startedIds: {
-                [Sequelize.Op.contains]: [studentId],
-            },
-        },
-    })
-}
-
-export const findAvailableCourses = (limit, offset, isActive = true) => {
+export const findAvailableCourses = async (limit, offset, isActive = true) => {
     const filter = isActive
         ? {
-              where: sequelize.where(sequelize.fn('array_length', sequelize.col('lessonsIds'), 1), {
-                  [Sequelize.Op.gte]: 5,
-              }),
-              attributes: ['id', 'title', 'description', 'instructorIds'],
+              include: [
+                  {
+                      model: Lesson,
+                      attributes: ['id'],
+                      required: false,
+                  },
+              ],
           }
         : {}
 
-    return Course.findAll({
+    const courses = await Course.findAll({
         limit: limit || 50,
         offset: offset,
         row: true,
-        attributes: [
-            'id',
-            'title',
-            'description',
-            'instructorIds',
-            'lessonsIds',
-            'startedIds',
-            'completedIds',
-        ],
+        attributes: ['id', 'title', 'description', 'instructorIds'],
         ...filter,
     })
+
+    if (!isActive) {
+        return courses
+    }
+
+    return courses
+        .filter((el) => el.Lessons.length >= 5)
+        .map(({ id, title, description, instructorIds }) => ({
+            id,
+            title,
+            description,
+            instructorIds,
+        }))
 }
 
-export const findCoursesByUserId = (id, role) => {
-    const filter =
-        role === USER_ROLES.INSTRUCTOR
-            ? {
-                  where: {
-                      instructorIds: [id],
-                  },
-                  attributes: [
-                      'id',
-                      'title',
-                      'description',
-                      'instructorIds',
-                      'lessonsIds',
-                      'startedIds',
-                      'completedIds',
-                  ],
-              }
-            : {
-                  where: {
-                      [Sequelize.Op.or]: {
-                          startedIds: [id],
-                          completedIds: [id],
-                      },
-                  },
-                  attributes: [
-                      'id',
-                      'title',
-                      'description',
-                      'instructorIds',
-                      'lessonsIds',
-                      'startedIds',
-                      'completedIds',
-                  ],
-              }
-
+export const findCoursesByInstructorId = (id) => {
     return Course.findAll({
-        attributes: [
-            'id',
-            'title',
-            'description',
-            'instructorIds',
-            'lessonsIds',
-            'startedIds',
-            'completedIds',
-        ],
-        ...filter,
+        where: {
+            instructorIds: [id],
+        },
+        attributes: ['id', 'title', 'description', 'instructorIds'],
     })
 }
 
-export const addLessonIdToCourse = (id, lessonId) => {
-    return Course.update(
-        {
-            lessonsIds: sequelize.fn('array_append', sequelize.col('lessonsIds'), lessonId),
-        },
-        { where: { id } }
-    )
+export const findStartedCourses = async (studentId) => {
+    const results = await Result.findAll({
+        where: { studentId },
+        attributes: [],
+        include: [
+            {
+                model: Course,
+                attributes: ['id', 'title', 'description', 'instructorIds'],
+                required: false,
+            },
+        ],
+    })
+
+    return results.map((el) => el.Course)
 }
 
-export const removeLessonIdFromCourse = (id, studentId) => {
-    return Course.update(
-        {
-            lessonsIds: sequelize.fn('array_remove', sequelize.col('startedIds'), studentId),
-        },
-        { where: { id } }
-    )
+export const removeCourseWithContains = async (course) => {
+    const { id, Lessons } = course
+
+    if (!Lodash.isEmpty(Lessons)) {
+        await removeLessonsWithContains(Lessons)
+    }
+
+    return Course.destroy({ where: { id } })
 }

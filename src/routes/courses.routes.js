@@ -5,39 +5,51 @@ import {
     assignInstructorToCourse,
     createCourse,
     findAvailableCourses,
-    findCoursesByUserId,
+    findCoursesByInstructorId,
     findStartedCourses,
     getCourseById,
-    startCourse,
+    getCourseWithContains,
+    getCourseWithLessonsById,
+    removeCourseWithContains,
     unassignInstructorFromCourse,
+    updateCourse,
 } from '../models/course'
-import {
-    getUserById,
-    getUserIdFromToken,
-} from '../models/user'
+import { getUserById, getUserIdFromToken } from '../models/user'
 import Lodash from 'lodash'
-import { createResult } from '../models/result'
+import { createResult, getAllResultsByStudentId } from '../models/result'
 
 const router = Router()
 
 router.post('/create', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
-        const { title, description } = await createCourse(req.body)
+        const { id, title, description } = await createCourse(req.body)
 
-        res.json({ title, description })
+        res.json({ id, title, description })
     } catch (e) {
         res.status(400).json({ message: e.message })
     }
 })
 
-router.post('/assign', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+router.put('/update', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+    try {
+        const { courseId, title, description } = req.body
+
+        await updateCourse(courseId, title, description)
+
+        res.json({ message: 'Course successfully updated' })
+    } catch (e) {
+        res.status(400).json({ message: e.message })
+    }
+})
+
+router.put('/assign', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
         const { courseId, instructorId } = req.body
 
         const user = await getUserById(instructorId)
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' })
+            return res.status(404).json({ message: 'Instructor not found' })
         } else if (user.role !== USER_ROLES.INSTRUCTOR) {
             return res.status(400).json({ message: 'User is not an instructor' })
         }
@@ -56,11 +68,7 @@ router.post('/assign', passport.authenticate([USER_ROLES.ADMIN]), async (req, re
                 .json({ message: 'This instructor is already assigned to the course' })
         }
 
-        const result = await assignInstructorToCourse(courseId, instructorId)
-
-        if (!result) {
-            return res.status(400).json({ message: 'Cannot assign instructor' })
-        }
+        await assignInstructorToCourse(courseId, instructorId)
 
         res.json({ message: 'Instructor successfully assigned' })
     } catch {
@@ -68,7 +76,7 @@ router.post('/assign', passport.authenticate([USER_ROLES.ADMIN]), async (req, re
     }
 })
 
-router.post('/unassign', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+router.put('/unassign', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
         const { courseId, instructorId } = req.body
 
@@ -92,11 +100,7 @@ router.post('/unassign', passport.authenticate([USER_ROLES.ADMIN]), async (req, 
                 .json({ message: 'This instructor is not assigned to the course' })
         }
 
-        const result = await unassignInstructorFromCourse(courseId, instructorId)
-
-        if (!result) {
-            return res.status(400).json({ message: 'Cannot unassign instructor' })
-        }
+        await unassignInstructorFromCourse(courseId, instructorId)
 
         res.json({ message: 'Instructor successfully unassigned' })
     } catch {
@@ -119,7 +123,13 @@ router.post('/start', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
             return res.status(404).json({ message: 'Student not found' })
         }
 
-        const findAllStartedCourses = await findStartedCourses(studentId)
+        const findAllStartedCourses = await getAllResultsByStudentId(studentId)
+
+        const isStarted = findAllStartedCourses.find((el) => el.courseId === courseId)
+
+        if (isStarted) {
+            return res.status(400).json({ message: 'Course is already started' })
+        }
 
         if (findAllStartedCourses.length >= 5) {
             return res.status(400).json({
@@ -128,14 +138,14 @@ router.post('/start', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
             })
         }
 
-        const course = await getCourseById(courseId)
-
-        if (course.lessonsIds.length < 5) {
-            return res.status(400).json({ message: 'Course is inactive' })
-        }
+        const course = await getCourseWithLessonsById(courseId)
 
         if (!course) {
             return res.status(404).json({ message: 'Course not found' })
+        }
+
+        if (course.Lessons.length < 5) {
+            return res.status(403).json({ message: 'Course is inactive' })
         }
 
         const isInstructorAssigned = !Lodash.isEmpty(course.instructorIds)
@@ -144,13 +154,6 @@ router.post('/start', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
             return res.status(400).json({ message: 'Instructor is not assigned' })
         }
 
-        const isStarted = course.startedIds.includes(studentId)
-
-        if (isStarted) {
-            return res.status(400).json({ message: 'Course is already started' })
-        }
-
-        await startCourse(courseId, studentId)
         await createResult(courseId, studentId)
 
         res.json({ message: 'Course successfully started' })
@@ -158,48 +161,6 @@ router.post('/start', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
         res.status(400).json({ message: 'Cannot start course' })
     }
 })
-
-// router.post('/complete', passport.authenticate([USER_ROLES.STUDENT]), async (req, res) => {
-//     try {
-//         const { jwt } = req.headers
-//         const { courseId } = req.body
-//
-//         if (!courseId) {
-//             return res.status(400).json({ message: 'Course id is not provided' })
-//         }
-//
-//         const studentId = await getUserIdFromToken(jwt)
-//
-//         if (!studentId) {
-//             return res.status(404).json({ message: 'Student not found' })
-//         }
-//
-//         const course = await getCourseById(courseId)
-//
-//         if (!course) {
-//             return res.status(404).json({ message: 'Course not found' })
-//         }
-//
-//         const isStarted = course.startedIds.includes(studentId)
-//
-//         if (!isStarted) {
-//             return res.status(400).json({ message: 'Course is not started' })
-//         }
-//
-//         const lessons = await Promise.all(
-//             course.lessonsIds.map((id) => getHomeworkByCredentials(id, studentId))
-//         )
-//         console.log('lessons', lessons)
-//
-//         //TODO: Check if all lessons completed, generate final mark.
-//         await completeCourse(courseId, studentId)
-//         await moveCourseToCompleted(courseId, studentId)
-//
-//         res.json({ message: 'Course successfully completed' })
-//     } catch {
-//         res.status(400).json({ message: 'Cannot complete course' })
-//     }
-// })
 
 router.get('/available', async (req, res) => {
     // For admin all courses is available
@@ -228,6 +189,36 @@ router.get('/available', async (req, res) => {
     }
 })
 
+router.get('/', async (req, res) => {
+    // For admin all courses is available
+    // For all authorized and unauthorized users all prepared courses (contains >= 5 lessons) is available
+
+    try {
+        const { id } = req.query
+        const { jwt } = req.headers
+
+        let isAdmin = false
+
+        if (jwt) {
+            const id = await getUserIdFromToken(jwt)
+            const { role } = await getUserById(id)
+            if (role === USER_ROLES.ADMIN) {
+                isAdmin = true
+            }
+        }
+
+        const course = await getCourseWithLessonsById(id)
+
+        if (!isAdmin && course.Lessons.length < 5) {
+            return res.status(403).json({ message: 'You are not authorized to see this course' })
+        }
+
+        res.json({ course })
+    } catch {
+        res.status(400).json({ message: 'Cannot get course' })
+    }
+})
+
 router.get(
     '/my',
     passport.authenticate([USER_ROLES.STUDENT, USER_ROLES.INSTRUCTOR]),
@@ -236,39 +227,37 @@ router.get(
             const { jwt } = req.headers
             const userId = await getUserIdFromToken(jwt)
             const { role } = await getUserById(userId)
-            const courses = await findCoursesByUserId(userId, role)
 
-            const mappedCourses = courses.map((course) => {
-                const {
-                    id,
-                    title,
-                    description,
-                    instructorIds,
-                    lessonsIds,
-                    startedIds,
-                    completedIds,
-                } = course
-                const isStarted = Boolean(startedIds.includes(userId))
-                const isCompleted = Boolean(completedIds.includes(userId))
+            if (role === USER_ROLES.INSTRUCTOR) {
+                const courses = await findCoursesByInstructorId(userId, role)
 
-                return {
-                    id,
-                    title,
-                    description,
-                    instructorIds,
-                    lessonsIds,
-                    isStarted,
-                    isCompleted,
-                }
-            })
+                return res.json({ courses })
+            }
 
-            // TODO: Add status if student passed the course, mark and feedback
+            const courses = await findStartedCourses(userId)
 
-            res.json({ courses: mappedCourses })
+            res.json({ courses })
         } catch {
             res.status(400).json({ message: 'Cannot get courses' })
         }
     }
 )
+
+router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
+    try {
+        const { id } = req.query
+        const course = await getCourseWithContains(id)
+
+        if (!course) {
+            res.status(404).json({ message: 'Course not found' })
+        }
+
+        await removeCourseWithContains(course)
+
+        res.json({ message: 'Course has been successfully removed' })
+    } catch {
+        res.status(400).json({ message: 'Cannot delete course' })
+    }
+})
 
 export default router

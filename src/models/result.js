@@ -1,5 +1,6 @@
-import { sequelize } from '../db.js'
+import { sequelize } from '../db/db.js'
 import Sequelize from 'sequelize'
+import { User } from './user'
 
 class ResultModel extends Sequelize.Model {}
 
@@ -32,7 +33,7 @@ export const Result = ResultModel.init(
         },
         isCoursePassed: {
             type: Sequelize.BOOLEAN,
-            defaultValue: false
+            defaultValue: false,
         },
         finalMark: {
             type: Sequelize.STRING,
@@ -45,7 +46,7 @@ export const Result = ResultModel.init(
         modelName: 'Results',
         sequelize,
     }
-    )
+)
 ;(async () => {
     await sequelize.sync()
 })()
@@ -58,22 +59,28 @@ export const getResultByCredentials = (courseId, studentId) => {
     return Result.findOne({ where: { courseId, studentId } })
 }
 
+export const getAllResultsByStudentId = (studentId) => {
+    return Result.findAll({ where: { studentId } })
+}
+
 export const updateFeedback = (id, finalMark, isCoursePassed) => {
     return Result.update({ finalMark, isCoursePassed }, { where: { id } })
 }
 
-export const updateFinalMark = (id, ) => {
-    return Result.findOne({ where: { id } })
+export const updateFinalMark = (id, finalMark, isCoursePassed) => {
+    return Result.update({ finalMark, isCoursePassed }, { where: { id } })
 }
 
-export const getAllResultsByCredentials = (ids, studentId) => {
-    return Result.findAll({ where: { courseId: ids, studentId } })
-}
-
-export const findAllPassedCoursesByStudentId = (studentId) => {
-    return Result.findAll({ where: { studentId, isCoursePassed: true } })
-}
-
-export const findAllInProgressCoursesByStudentId = (ids, studentId) => {
-    return Result.findAll({ where: { studentId, isCoursePassed: false } })
+export const getStudentsPerCourse = (courseId) => {
+    return Result.findAll({
+        where: { courseId },
+        attributes: [],
+        include: [
+            {
+                model: User,
+                attributes: ['id', 'email', 'firstName', 'lastName'],
+                required: false,
+            },
+        ],
+    })
 }

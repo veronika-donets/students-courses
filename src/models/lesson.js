@@ -1,5 +1,8 @@
-import { sequelize } from '../db.js'
+import { sequelize } from '../db/db.js'
 import Sequelize from 'sequelize'
+import { Homework, removeHomeworksWithContains } from './homework'
+import { File, removeFiles } from './file'
+import Lodash from 'lodash'
 
 class LessonModel extends Sequelize.Model {}
 
@@ -37,14 +40,6 @@ export const Lesson = LessonModel.init(
         description: {
             type: Sequelize.STRING,
         },
-        uploadedFileIds: {
-            type: Sequelize.ARRAY(Sequelize.UUID),
-            defaultValue: [],
-        },
-        homeworkIds: {
-            type: Sequelize.ARRAY(Sequelize.UUID),
-            defaultValue: [],
-        },
     },
     {
         modelName: 'Lessons',
@@ -55,40 +50,82 @@ export const Lesson = LessonModel.init(
     await sequelize.sync()
 })()
 
-export const getLessonById = (id) => {
-    return Lesson.findOne({ where: { id } })
+export const getLessonWithFiles = (id) => {
+    return Lesson.findOne({
+        where: { id },
+        include: [
+            {
+                model: Homework,
+                attributes: ['id', 'lessonId'],
+                include: [
+                    {
+                        model: File,
+                        attributes: ['id'],
+                        required: false,
+                    },
+                ],
+            },
+            {
+                model: File,
+                attributes: ['id'],
+                required: false,
+            },
+        ],
+    })
 }
 
-export const getLessonByTitle = (title) => {
-    return Lesson.findOne({ where: { title } })
+export const getLessonWithHomeworkById = (id, studentId) => {
+    return Lesson.findOne({
+        where: { id },
+        include: [
+            {
+                model: Homework,
+                where: { studentId },
+                attributes: ['id', 'lessonId'],
+                required: false,
+            },
+        ],
+    })
 }
 
-export const createLesson = (courseId, title, description, uploadedFileIds) => {
-    return Lesson.create({ courseId, title, description, uploadedFileIds })
+export const getLessonWithFilesById = (id) => {
+    return Lesson.findOne({
+        where: { id },
+        include: [
+            {
+                model: File,
+                attributes: ['id'],
+                required: false,
+            },
+        ],
+    })
 }
 
-export const updateLesson = (id, title, description, uploadedFileIds) => {
-    return Lesson.update({ title, description, uploadedFileIds }, { where: { id } })
+export const createLesson = (courseId, title, description) => {
+    return Lesson.create({ courseId, title, description })
 }
 
-export const removeLesson = (id) => {
-    return Lesson.destroy({ where: { id } })
+export const updateLesson = (id, title, description) => {
+    return Lesson.update({ title, description }, { where: { id } })
 }
 
-export const addHomeworkIdToLesson = (id, homeworkId) => {
-    return Lesson.update(
-        {
-            homeworkIds: sequelize.fn('array_append', sequelize.col('homeworkIds'), homeworkId),
-        },
-        { where: { id } }
+export const removeLessonsWithContains = async (lessons) => {
+    if (Lodash.isEmpty(lessons)) return
+
+    const lessonsIds = lessons.map((el) => el.id)
+    const lessonFileIds = lessons.map((el) => el.Files.map((file) => file.id)).flat(1)
+
+    await removeFiles(lessonFileIds)
+
+    await Promise.all(
+        lessons.map((lesson) => {
+            const { Homeworks } = lesson
+
+            if (Lodash.isEmpty(Homeworks)) return
+
+            return removeHomeworksWithContains(Homeworks)
+        })
     )
-}
 
-export const removeHomeworkIdFromLesson = (id, homeworkId) => {
-    return Lesson.update(
-        {
-            homeworkIds: sequelize.fn('array_remove', sequelize.col('homeworkIds'), homeworkId),
-        },
-        { where: { id } }
-    )
+    return Lesson.destroy({ where: { id: lessonsIds } })
 }

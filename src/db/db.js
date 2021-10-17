@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize'
-import { getEnvVar } from './helpers'
+import { getEnvVar } from '../helpers'
 
 const dbName = getEnvVar('DB_NAME')
 const dbUser = getEnvVar('DB_USER')

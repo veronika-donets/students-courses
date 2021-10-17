@@ -1,9 +1,12 @@
 import { USER_ROLES, VALIDATION_REGEX } from '../helpers'
-import { sequelize } from '../db.js'
+import { sequelize } from '../db/db.js'
 import Sequelize from 'sequelize'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import jwt_decode from 'jwt-decode'
+import { Lesson } from './lesson'
+import { Result } from './result'
+import { Course } from './course'
 
 class UserModel extends Sequelize.Model {}
 
@@ -106,6 +109,27 @@ export const getUserByEmail = (userEmail) => {
 
 export const getUserById = (id) => {
     return User.findOne({ where: { id } })
+}
+
+export const findLessonInProgressCourses = (studentId, lessonId) => {
+    return Result.findAll({
+        where: { studentId, isCoursePassed: false },
+        include: [
+            {
+                model: Course,
+                attributes: ['id'],
+                required: false,
+                include: [
+                    {
+                        model: Lesson,
+                        attributes: ['id'],
+                        where: { id: lessonId },
+                        required: false,
+                    },
+                ],
+            },
+        ],
+    })
 }
 
 export const getUserByCredentials = async (email, password) => {
