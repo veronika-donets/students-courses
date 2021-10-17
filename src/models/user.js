@@ -5,8 +5,11 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import jwt_decode from 'jwt-decode'
 import { Lesson } from './lesson'
-import { Result } from './result'
+import { removeResults, Result } from './result'
 import { Course } from './course'
+import { Homework, removeHomeworksWithContains } from './homework'
+import { File } from './file'
+import Lodash from 'lodash'
 
 class UserModel extends Sequelize.Model {}
 
@@ -107,6 +110,33 @@ export const getUserByEmail = (userEmail) => {
     return User.findOne({ where: { email } })
 }
 
+export const getUserByEmailWithContains = (userEmail) => {
+    const email = userEmail ? userEmail.toLowerCase() : ''
+    return User.findOne({
+        where: { email },
+        attributes: ['id', 'role'],
+        include: [
+            {
+                model: Result,
+                attributes: ['id'],
+                required: false,
+            },
+            {
+                model: Homework,
+                attributes: ['id'],
+                required: false,
+                include: [
+                    {
+                        model: File,
+                        attributes: ['id'],
+                        required: false,
+                    },
+                ],
+            },
+        ],
+    })
+}
+
 export const getUserById = (id) => {
     return User.findOne({ where: { id } })
 }
@@ -199,6 +229,16 @@ export const updateUserRole = (id, newRole) => {
     return null
 }
 
-export const removeUser = (email) => {
-    return User.destroy({ where: { email } })
+export const removeUserWithRelations = async (user) => {
+    const { id, Results, Homeworks } = user
+
+    if (!Lodash.isEmpty(Homeworks)) {
+        await removeHomeworksWithContains(Homeworks)
+    }
+
+    if (!Lodash.isEmpty(Results)) {
+        await removeResults(Results)
+    }
+
+    return User.destroy({ where: { id } })
 }

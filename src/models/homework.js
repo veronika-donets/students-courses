@@ -103,10 +103,6 @@ export const putMark = (id, mark) => {
     return Homework.update({ mark }, { where: { id } })
 }
 
-export const removeHomework = (id) => {
-    return Homework.destroy({ where: { id } })
-}
-
 export const removeHomeworksWithContains = async (homeworks) => {
     if (Lodash.isEmpty(homeworks)) return
 
