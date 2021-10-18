@@ -1,6 +1,6 @@
 import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
-import { getFileById } from '../models/file'
+import { getFileById } from '../services/file.service'
 import { Router } from 'express'
 
 const router = Router()

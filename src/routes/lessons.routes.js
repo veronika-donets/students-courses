@@ -7,12 +7,16 @@ import {
     getLessonWithFiles,
     updateLesson,
     removeLessonsWithContains,
-} from '../models/lesson'
+} from '../services/lesson.service'
 import multer from 'multer'
-import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../models/file'
-import { getCourseById } from '../models/course'
+import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../services/file.service'
+import { getCourseById } from '../services/course.service'
 import Lodash from 'lodash'
-import { getUserById, getUserIdFromToken, findLessonInProgressCourses } from '../models/user'
+import {
+    getUserById,
+    getUserIdFromToken,
+    findLessonInProgressCourses,
+} from '../services/user.service'
 
 const router = Router()
 const upload = multer({ dest: 'uploads/' })

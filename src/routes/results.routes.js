@@ -1,7 +1,11 @@
 import { Router } from 'express'
 import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
-import { getResultByCredentials, getStudentsPerCourse, updateFeedback } from '../models/result'
+import {
+    getResultByCredentials,
+    getStudentsPerCourse,
+    updateFeedback,
+} from '../services/result.service'
 
 const router = Router()
 

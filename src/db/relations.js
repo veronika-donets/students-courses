@@ -1,10 +1,10 @@
+import { sequelize } from './db'
 import { User } from '../models/user'
 import { Homework } from '../models/homework'
 import { Course } from '../models/course'
 import { Lesson } from '../models/lesson'
 import { File } from '../models/file'
 import { Result } from '../models/result'
-import { sequelize } from './db'
 
 export async function defineDbRelations() {
     User.hasMany(Homework, { foreignKey: 'studentId' })

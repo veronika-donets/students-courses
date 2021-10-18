@@ -13,10 +13,10 @@ import {
     removeCourseWithContains,
     unassignInstructorFromCourse,
     updateCourse,
-} from '../models/course'
-import { getUserById, getUserIdFromToken } from '../models/user'
+} from '../services/course.service'
+import { getUserById, getUserIdFromToken } from '../services/user.service'
 import Lodash from 'lodash'
-import { createResult, getAllResultsByStudentId } from '../models/result'
+import { createResult, getAllResultsByStudentId } from '../services/result.service'
 
 const router = Router()
 
