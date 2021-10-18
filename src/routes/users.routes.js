@@ -3,19 +3,23 @@ import {
     createUser,
     generateAuthToken,
     getUserByCredentials,
-    getUserByEmail, getUserByEmailWithContains,
+    getUserByEmail,
+    getUserByEmailWithContains,
     getUserById,
     getUserIdFromToken,
     removeUserWithRelations,
     updateIsEmailVerified,
     updatePassword,
     updateUserRole,
-} from '../models/user'
+} from '../services/user.service'
 import { sendResetPassEmail, sendVerificationEmail } from '../services/email.service'
 import jwt_decode from 'jwt-decode'
 import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
-import { getCoursesByInstructorId, unassignInstructorFromAllCourses } from '../models/course'
+import {
+    getCoursesByInstructorId,
+    unassignInstructorFromAllCourses,
+} from '../services/course.service'
 
 const router = Router()
 
@@ -255,7 +259,7 @@ router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) =
 
         if (role === USER_ROLES.INSTRUCTOR) {
             const courses = await getCoursesByInstructorId(id)
-            const courseIds = courses.map(el => el.id)
+            const courseIds = courses.map((el) => el.id)
 
             await unassignInstructorFromAllCourses(courseIds, id)
         }

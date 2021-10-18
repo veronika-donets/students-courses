@@ -1,7 +1,7 @@
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
 import { USER_ROLES } from '../helpers'
 import passport from 'passport'
-import { getUserById } from '../models/user'
+import { getUserById } from '../services/user.service'
 
 const options = Object.freeze({
     jwtFromRequest: ExtractJwt.fromHeader('jwt'),

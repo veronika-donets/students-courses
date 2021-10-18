@@ -2,8 +2,8 @@ import { Router } from 'express'
 import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
 import multer from 'multer'
-import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../models/file'
-import { getUserById, getUserIdFromToken } from '../models/user'
+import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../services/file.service'
+import { getUserById, getUserIdFromToken } from '../services/user.service'
 import {
     createHomework,
     putMark,
@@ -12,11 +12,11 @@ import {
     getHomeworkWithLessonById,
     getAllHomeworksPerCourse,
     removeHomeworksWithContains,
-} from '../models/homework'
-import { getLessonWithHomeworkById } from '../models/lesson'
+} from '../services/homework.service'
+import { getLessonWithHomeworkById } from '../services/lesson.service'
 import Lodash from 'lodash'
-import { getResultByCredentials, updateFinalMark } from '../models/result'
-import { getCourseWithLessonsById } from '../models/course'
+import { getResultByCredentials, updateFinalMark } from '../services/result.service'
+import { getCourseWithLessonsById } from '../services/course.service'
 
 const router = Router()
 const upload = multer({ dest: 'uploads/' })

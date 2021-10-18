@@ -5,8 +5,8 @@
   "type": "module",
   "main": "./index.js",
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node index.js",
-    "dev": "nodemon --experimental-specifier-resolution=node index.js",
+    "start": "NODE_ENV=PROD node --experimental-specifier-resolution=node index.js",
+    "dev": "NODE_ENV=DEV nodemon --experimental-specifier-resolution=node index.js",
     "lint": "eslint '**/*.{js}' --quiet --fix",
     "prettify": "prettier --write \"src/**/*.js\" \"index.js\"",
     "test": "jest --coverage"
