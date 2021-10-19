@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import jwt_decode from 'jwt-decode'
 import { removeResults } from './result.service'
-import { removeHomeworksWithContains } from './homework.service'
+import { removeHomeworksWithRelations } from './homework.service'
 import { File } from '../models/file'
 import Lodash from 'lodash'
 import { User } from '../models/user'
@@ -17,7 +17,7 @@ export const getUserByEmail = (userEmail) => {
     return User.findOne({ where: { email } })
 }
 
-export const getUserByEmailWithContains = (userEmail) => {
+export const getUserByEmailWithRelations = (userEmail) => {
     const email = userEmail ? userEmail.toLowerCase() : ''
     return User.findOne({
         where: { email },
@@ -140,7 +140,7 @@ export const removeUserWithRelations = async (user) => {
     const { id, Results, Homeworks } = user
 
     if (!Lodash.isEmpty(Homeworks)) {
-        await removeHomeworksWithContains(Homeworks)
+        await removeHomeworksWithRelations(Homeworks)
     }
 
     if (!Lodash.isEmpty(Results)) {

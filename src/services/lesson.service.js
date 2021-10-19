@@ -1,4 +1,4 @@
-import { removeHomeworksWithContains } from './homework.service'
+import { removeHomeworksWithRelations } from './homework.service'
 import { removeFiles } from './file.service'
 import Lodash from 'lodash'
 import { Lesson } from '../models/lesson'
@@ -63,7 +63,7 @@ export const updateLesson = (id, title, description) => {
     return Lesson.update({ title, description }, { where: { id } })
 }
 
-export const removeLessonsWithContains = async (lessons) => {
+export const removeLessonsWithRelations = async (lessons) => {
     if (Lodash.isEmpty(lessons)) return
 
     const lessonsIds = lessons.map((el) => el.id)
@@ -77,7 +77,7 @@ export const removeLessonsWithContains = async (lessons) => {
 
             if (Lodash.isEmpty(Homeworks)) return
 
-            return removeHomeworksWithContains(Homeworks)
+            return removeHomeworksWithRelations(Homeworks)
         })
     )
 

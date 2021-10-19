@@ -6,7 +6,7 @@ import {
     getLessonWithFilesById,
     getLessonWithFiles,
     updateLesson,
-    removeLessonsWithContains,
+    removeLessonsWithRelations,
 } from '../services/lesson.service'
 import multer from 'multer'
 import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../services/file.service'
@@ -150,7 +150,7 @@ router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) =
             return res.status(404).json({ message: 'Lesson not found' })
         }
 
-        await removeLessonsWithContains([lesson])
+        await removeLessonsWithRelations([lesson])
 
         res.json({ message: 'Lesson has been successfully removed' })
     } catch {

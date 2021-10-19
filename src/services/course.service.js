@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize'
 import { sequelize } from '../db/db'
-import { removeLessonsWithContains } from './lesson.service'
+import { removeLessonsWithRelations } from './lesson.service'
 import Lodash from 'lodash'
 import { Course } from '../models/course'
 import { Lesson } from '../models/lesson'
@@ -25,7 +25,7 @@ export const getCourseWithLessonsById = (id) => {
     })
 }
 
-export const getCourseWithContains = (id) => {
+export const getCourseWithRelations = (id) => {
     return Course.findOne({
         where: { id },
         attributes: ['id'],
@@ -165,11 +165,11 @@ export const findStartedCourses = async (studentId) => {
     return results.map((el) => el.Course)
 }
 
-export const removeCourseWithContains = async (course) => {
+export const removeCourseWithRelations = async (course) => {
     const { id, Lessons } = course
 
     if (!Lodash.isEmpty(Lessons)) {
-        await removeLessonsWithContains(Lessons)
+        await removeLessonsWithRelations(Lessons)
     }
 
     return Course.destroy({ where: { id } })
