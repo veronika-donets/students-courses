@@ -4,7 +4,7 @@ import {
     generateAuthToken,
     getUserByCredentials,
     getUserByEmail,
-    getUserByEmailWithContains,
+    getUserByEmailWithRelations,
     getUserById,
     getUserIdFromToken,
     removeUserWithRelations,
@@ -249,7 +249,7 @@ router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) =
             return res.status(400).json({ message: 'User email is not provided' })
         }
 
-        const user = await getUserByEmailWithContains(email)
+        const user = await getUserByEmailWithRelations(email)
 
         const { id, role } = user
 

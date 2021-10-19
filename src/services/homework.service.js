@@ -50,7 +50,7 @@ export const putMark = (id, mark) => {
     return Homework.update({ mark }, { where: { id } })
 }
 
-export const removeHomeworksWithContains = async (homeworks) => {
+export const removeHomeworksWithRelations = async (homeworks) => {
     if (Lodash.isEmpty(homeworks)) return
 
     const homeworkIds = homeworks.map((el) => el.id)

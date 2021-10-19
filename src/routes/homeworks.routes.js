@@ -11,7 +11,7 @@ import {
     getHomeworkWithFilesById,
     getHomeworkWithLessonById,
     getAllHomeworksPerCourse,
-    removeHomeworksWithContains,
+    removeHomeworksWithRelations,
 } from '../services/homework.service'
 import { getLessonWithHomeworkById } from '../services/lesson.service'
 import Lodash from 'lodash'
@@ -269,7 +269,7 @@ router.delete('/', passport.authenticate([USER_ROLES.STUDENT]), async (req, res)
                 .json({ message: 'Verified homework with mark cannot be removed' })
         }
 
-        await removeHomeworksWithContains([homework])
+        await removeHomeworksWithRelations([homework])
 
         res.json({
             message: 'Homework has been removed',

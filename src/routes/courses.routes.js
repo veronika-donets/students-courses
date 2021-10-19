@@ -8,9 +8,9 @@ import {
     findCoursesByInstructorId,
     findStartedCourses,
     getCourseById,
-    getCourseWithContains,
+    getCourseWithRelations,
     getCourseWithLessonsById,
-    removeCourseWithContains,
+    removeCourseWithRelations,
     unassignInstructorFromCourse,
     updateCourse,
 } from '../services/course.service'
@@ -246,13 +246,13 @@ router.get(
 router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
     try {
         const { id } = req.query
-        const course = await getCourseWithContains(id)
+        const course = await getCourseWithRelations(id)
 
         if (!course) {
             return res.status(404).json({ message: 'Course not found' })
         }
 
-        await removeCourseWithContains(course)
+        await removeCourseWithRelations(course)
 
         res.json({ message: 'Course has been successfully removed' })
     } catch {
