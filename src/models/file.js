@@ -19,15 +19,8 @@ export const File = FilesModel.init(
         mimetype: {
             type: Sequelize.STRING,
         },
-        filename: {
-            type: Sequelize.STRING,
-        },
         size: {
             type: Sequelize.INTEGER,
-        },
-        data: {
-            type: Sequelize.BLOB,
-            allowNull: false,
         },
     },
     {

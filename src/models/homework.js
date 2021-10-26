@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize'
 import { sequelize } from '../db/db.js'
-import { VALIDATION_REGEX } from '../helpers'
+import { VALIDATIONS } from '../helpers'
 
 class HomeworkModel extends Sequelize.Model {}
 
@@ -38,7 +38,7 @@ export const Homework = HomeworkModel.init(
             type: Sequelize.INTEGER,
             validate: {
                 is: {
-                    args: VALIDATION_REGEX.MARK,
+                    args: VALIDATIONS.MARK,
                     msg: 'Mark must be from 0 to 100',
                 },
             },

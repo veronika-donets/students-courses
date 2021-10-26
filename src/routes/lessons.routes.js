@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import passport from '../config/passport'
-import { USER_ROLES } from '../helpers'
+import { checkUnsupportedFormat, USER_ROLES } from '../helpers'
 import {
     createLesson,
     getLessonWithFilesById,
@@ -9,7 +9,12 @@ import {
     removeLessonsWithRelations,
 } from '../services/lesson.service'
 import multer from 'multer'
-import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../services/file.service'
+import {
+    cleanUploadsFolder,
+    createUploadedFile,
+    createUploadedFilesWithS3,
+    removeFilesWithS3,
+} from '../services/file.service'
 import { getCourseById } from '../services/course.service'
 import Lodash from 'lodash'
 import {
@@ -17,6 +22,7 @@ import {
     getUserIdFromToken,
     findLessonInProgressCourses,
 } from '../services/user.service'
+import { uploadToS3 } from '../services/aws-S3.service'
 
 const router = Router()
 const upload = multer({ dest: 'uploads/' })
@@ -36,6 +42,12 @@ router.post(
             } = req.body
             const { files } = req
 
+            const hasUnsupportedFormat = checkUnsupportedFormat(files)
+
+            if (hasUnsupportedFormat) {
+                return res.status(400).json({ message: 'Unsupported file format' })
+            }
+
             const course = await getCourseById(identifier)
 
             if (!course) {
@@ -48,10 +60,14 @@ router.post(
                 lessonDescription
             )
 
-            const createdFiles = await Promise.all(
-                files.map((file) => createUploadedFile(id, file))
+            const uploadedFiles = await Promise.all(
+                files.map(async (file) => {
+                    await uploadToS3(file, id)
+                    return createUploadedFile(file, id)
+                })
             )
-            const fileIds = createdFiles.map((file) => file.id)
+
+            const fileIds = uploadedFiles.map((file) => file.id)
 
             res.json({ id, courseId, title, description, fileIds })
         } catch (e) {
@@ -79,7 +95,10 @@ router.get(
 
             if (user.role === USER_ROLES.STUDENT) {
                 const result = await findLessonInProgressCourses(userId, id)
+
                 const mapped = result.map((el) => el.Course).filter((el) => el !== null)
+
+                //FIXME: Student should see lessons only taken courses
 
                 if (Lodash.isEmpty(mapped)) {
                     return res
@@ -89,6 +108,10 @@ router.get(
             }
 
             const lesson = await getLessonWithFilesById(id)
+
+            if (!lesson) {
+                return res.status(404).json({ message: 'Lesson not found' })
+            }
 
             res.json({ lesson })
         } catch {
@@ -121,10 +144,8 @@ router.put(
             await updateLesson(id, title, description)
 
             if (!Lodash.isEmpty(files)) {
-                await Promise.all(files.map((file) => createUploadedFile(id, file)))
-
-                const uploadedFileIds = lesson.Files.map((el) => el.id)
-                await removeFiles(uploadedFileIds)
+                await removeFilesWithS3(lesson.Files)
+                await createUploadedFilesWithS3(files, id)
             }
 
             res.json({ message: 'Lesson successfully updated' })

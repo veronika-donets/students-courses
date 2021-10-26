@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize'
-import { USER_ROLES, VALIDATION_REGEX } from '../helpers'
+import { USER_ROLES, VALIDATIONS } from '../helpers'
 import { sequelize } from '../db/db'
 import { hashPassword } from '../services/user.service'
 
@@ -17,7 +17,7 @@ export const User = UserModel.init(
             allowNull: false,
             validate: {
                 is: {
-                    args: VALIDATION_REGEX.FIRST_NAME,
+                    args: VALIDATIONS.FIRST_NAME,
                     msg: 'First name must be from 2 to 50 characters, special characters is not allowed',
                 },
             },
@@ -27,7 +27,7 @@ export const User = UserModel.init(
             allowNull: false,
             validate: {
                 is: {
-                    args: VALIDATION_REGEX.LAST_NAME,
+                    args: VALIDATIONS.LAST_NAME,
                     msg: 'Last name must be from 2 to 50 characters, special characters is not allowed',
                 },
             },
@@ -37,7 +37,7 @@ export const User = UserModel.init(
             allowNull: false,
             validate: {
                 is: {
-                    args: VALIDATION_REGEX.EMAIL,
+                    args: VALIDATIONS.EMAIL,
                     msg: 'Invalid email address',
                 },
             },
@@ -56,7 +56,7 @@ export const User = UserModel.init(
             allowNull: false,
             validate: {
                 is: {
-                    args: VALIDATION_REGEX.PASSWORD,
+                    args: VALIDATIONS.PASSWORD,
                     msg: 'Password must be from 8 to 60 characters, at least one letter and one number',
                 },
             },
