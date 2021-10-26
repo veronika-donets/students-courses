@@ -1,8 +1,9 @@
 import { removeHomeworksWithRelations } from './homework.service'
-import { removeFiles } from './file.service'
+import { removeFilesWithS3 } from './file.service'
 import Lodash from 'lodash'
 import { Lesson } from '../models/lesson'
 import { Homework } from '../models/homework'
+import { File } from '../models/file'
 
 export const getLessonWithFiles = (id) => {
     return Lesson.findOne({
@@ -11,6 +12,7 @@ export const getLessonWithFiles = (id) => {
             {
                 model: Homework,
                 attributes: ['id', 'lessonId'],
+                required: false,
                 include: [
                     {
                         model: File,
@@ -48,7 +50,7 @@ export const getLessonWithFilesById = (id) => {
         include: [
             {
                 model: File,
-                attributes: ['id'],
+                attributes: ['id', 'sourceId', 'originalname'],
                 required: false,
             },
         ],
@@ -67,9 +69,9 @@ export const removeLessonsWithRelations = async (lessons) => {
     if (Lodash.isEmpty(lessons)) return
 
     const lessonsIds = lessons.map((el) => el.id)
-    const lessonFileIds = lessons.map((el) => el.Files.map((file) => file.id)).flat(1)
+    const lessonFiles = lessons.map((el) => el.Files).flat(1)
 
-    await removeFiles(lessonFileIds)
+    await removeFilesWithS3(lessonFiles)
 
     await Promise.all(
         lessons.map((lesson) => {

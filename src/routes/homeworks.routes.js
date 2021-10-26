@@ -1,8 +1,13 @@
 import { Router } from 'express'
 import passport from '../config/passport'
-import { USER_ROLES } from '../helpers'
+import { checkUnsupportedFormat, USER_ROLES } from '../helpers'
 import multer from 'multer'
-import { cleanUploadsFolder, createUploadedFile, removeFiles } from '../services/file.service'
+import {
+    cleanUploadsFolder,
+    createUploadedFile,
+    createUploadedFilesWithS3,
+    removeFiles,
+} from '../services/file.service'
 import { getUserById, getUserIdFromToken } from '../services/user.service'
 import {
     createHomework,
@@ -32,6 +37,12 @@ router.post(
             const { lessonId, comment } = req.body
             const { jwt } = req.headers
             const { files } = req
+
+            const hasUnsupportedFormat = checkUnsupportedFormat(files)
+
+            if (hasUnsupportedFormat) {
+                return res.status(400).json({ message: 'Unsupported file format' })
+            }
 
             if (!lessonId) {
                 return res.status(400).json({ message: 'Lesson id is not provided' })
@@ -65,11 +76,9 @@ router.post(
 
             const homework = await createHomework(lessonId, studentId, comment)
 
-            const createdFiles = await Promise.all(
-                files.map((file) => createUploadedFile(homework.id, file))
-            )
+            const uploadedFiles = await createUploadedFilesWithS3(files, homework.id)
 
-            const fileIds = createdFiles.map((file) => file.id)
+            const fileIds = uploadedFiles.map((file) => file.id)
 
             res.json({
                 id: homework.id,
