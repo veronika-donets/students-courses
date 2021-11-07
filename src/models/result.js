@@ -46,6 +46,3 @@ export const Result = ResultModel.init(
         sequelize,
     }
 )
-;(async () => {
-    await sequelize.sync()
-})()
