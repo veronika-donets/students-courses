@@ -44,6 +44,3 @@ export const Course = CourseModel.init(
         sequelize,
     }
 )
-;(async () => {
-    await sequelize.sync()
-})()

@@ -1,33 +1,36 @@
-version: "3"
+version: "3.8"
 services:
   api:
     build: .
     container_name: sombra-courses-api
     image: sombra-courses-api
-    restart: always
+    restart: unless-stopped
     ports:
       - "8080:8080"
     networks:
-      - courses-app
+      - app-tier
     depends_on:
       - db
     env_file:
-      - ./.env
+      - .env
+    environment:
+      - DB_HOST_DEV=db
   db:
     container_name: postgres
-    image: postgres
+    image: postgres:14.0-alpine
     ports:
       - "5432:5432"
     volumes:
       - ./data:/data/db
     env_file:
-      - ./.env
+      - .env
     environment:
-      - POSTGRES_USER=`${DB_USER}_${NODE_ENV}`
-      - POSTGRES_PASSWORD=`${DB_PASS}_${NODE_ENV}`
+      - POSTGRES_USER=$DB_USER_DEV
+      - POSTGRES_PASSWORD=$DB_PASS_DEV
+      - POSTGRES_DB=$DB_NAME_DEV
     networks:
-      - courses-app
+      - app-tier
 networks:
-  courses-app:
+  app-tier:
     driver: bridge
 

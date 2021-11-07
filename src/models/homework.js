@@ -49,6 +49,3 @@ export const Homework = HomeworkModel.init(
         sequelize,
     }
 )
-;(async () => {
-    await sequelize.sync()
-})()

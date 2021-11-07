@@ -28,6 +28,3 @@ export const File = FilesModel.init(
         sequelize,
     }
 )
-;(async () => {
-    await sequelize.sync()
-})()

@@ -93,6 +93,3 @@ export const User = UserModel.init(
         },
     }
 )
-;(async () => {
-    await sequelize.sync()
-})()
