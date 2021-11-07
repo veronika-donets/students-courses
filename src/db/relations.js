@@ -16,11 +16,11 @@ export async function defineDbRelations() {
     Lesson.hasMany(Homework, { foreignKey: 'lessonId' })
     Homework.belongsTo(Lesson, { foreignKey: 'lessonId' })
 
-    Lesson.hasMany(File, { foreignKey: 'sourceId' })
-    File.belongsTo(Lesson, { foreignKey: 'sourceId' })
+    Lesson.hasMany(File, { foreignKey: 'sourceId', constraints: false })
+    File.belongsTo(Lesson, { foreignKey: 'sourceId', constraints: false })
 
-    Homework.hasMany(File, { foreignKey: 'sourceId' })
-    File.belongsTo(Homework, { foreignKey: 'sourceId' })
+    Homework.hasMany(File, { foreignKey: 'sourceId', constraints: false })
+    File.belongsTo(Homework, { foreignKey: 'sourceId', constraints: false })
 
     Course.hasMany(Result, { foreignKey: 'courseId' })
     Result.belongsTo(Course, { foreignKey: 'courseId' })
