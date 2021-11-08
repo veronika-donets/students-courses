@@ -9,7 +9,9 @@
     "dev": "NODE_ENV=DEV nodemon --experimental-specifier-resolution=node index.js",
     "lint": "eslint '**/*.{js}' --quiet --fix",
     "prettify": "prettier --write \"src/**/*.js\" \"index.js\"",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "docker-build": "NODE_ENV=DEV docker compose build",
+    "docker-run": "NODE_ENV=DEV docker compose up"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.7",

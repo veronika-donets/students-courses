@@ -29,10 +29,6 @@ export const Lesson = LessonModel.init(
                     msg: 'Lesson title should not be empty',
                 },
             },
-            unique: {
-                args: true,
-                msg: 'Lesson with the same title already exists',
-            },
         },
         description: {
             type: Sequelize.STRING,

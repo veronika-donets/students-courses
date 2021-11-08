@@ -7,6 +7,8 @@ import {
     getLessonWithFiles,
     updateLesson,
     removeLessonsWithRelations,
+    findLessonPerCourseByTitle,
+    findCourseFromLessonId,
 } from '../services/lesson.service'
 import multer from 'multer'
 import {
@@ -17,12 +19,9 @@ import {
 } from '../services/file.service'
 import { getCourseById } from '../services/course.service'
 import Lodash from 'lodash'
-import {
-    getUserById,
-    getUserIdFromToken,
-    findLessonInProgressCourses,
-} from '../services/user.service'
+import { getUserById, getUserIdFromToken } from '../services/user.service'
 import { uploadToS3 } from '../services/aws-S3.service'
+import { getResultByCredentials } from '../services/result.service'
 
 const router = Router()
 const upload = multer({ dest: 'uploads/' })
@@ -46,6 +45,14 @@ router.post(
 
             if (hasUnsupportedFormat) {
                 return res.status(400).json({ message: 'Unsupported file format' })
+            }
+
+            const existingLesson = await findLessonPerCourseByTitle(identifier, lessonTitle)
+
+            if (existingLesson) {
+                return res
+                    .status(400)
+                    .json({ message: 'Lesson with the same title already exists in this course' })
             }
 
             const course = await getCourseById(identifier)
@@ -94,13 +101,13 @@ router.get(
             }
 
             if (user.role === USER_ROLES.STUDENT) {
-                const result = await findLessonInProgressCourses(userId, id)
+                const lesson = await findCourseFromLessonId(id)
 
-                const mapped = result.map((el) => el.Course).filter((el) => el !== null)
+                const { id: courseId } = lesson.Course
 
-                //FIXME: Student should see lessons only taken courses
+                const result = await getResultByCredentials(courseId, userId)
 
-                if (Lodash.isEmpty(mapped)) {
+                if (!result) {
                     return res
                         .status(403)
                         .json({ message: 'You are not authorized to see this lesson' })
