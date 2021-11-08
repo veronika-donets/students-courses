@@ -8,9 +8,7 @@ import { File } from '../models/file'
 import Lodash from 'lodash'
 import { User } from '../models/user'
 import { Result } from '../models/result'
-import { Course } from '../models/course'
 import { Homework } from '../models/homework'
-import { Lesson } from '../models/lesson'
 
 export const getUserByEmail = (userEmail) => {
     const email = userEmail ? userEmail.toLowerCase() : ''
@@ -46,27 +44,6 @@ export const getUserByEmailWithRelations = (userEmail) => {
 
 export const getUserById = (id) => {
     return User.findOne({ where: { id } })
-}
-
-export const findLessonInProgressCourses = (studentId, lessonId) => {
-    return Result.findAll({
-        where: { studentId, isCoursePassed: false },
-        include: [
-            {
-                model: Course,
-                attributes: ['id'],
-                required: false,
-                include: [
-                    {
-                        model: Lesson,
-                        attributes: ['id'],
-                        where: { id: lessonId },
-                        required: false,
-                    },
-                ],
-            },
-        ],
-    })
 }
 
 export const getUserByCredentials = async (email, password) => {

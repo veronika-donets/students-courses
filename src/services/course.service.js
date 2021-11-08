@@ -6,6 +6,7 @@ import { Course } from '../models/course'
 import { Lesson } from '../models/lesson'
 import { Homework } from '../models/homework'
 import { File } from '../models/file'
+import { Result } from '../models/result'
 
 export const getCourseById = (id) => {
     return Course.findOne({ where: { id } })
@@ -131,7 +132,7 @@ export const findAvailableCourses = async (limit, offset, isActive = true) => {
     }
 
     return courses
-        .filter((el) => el.Lessons.length >= 5)
+        .filter((el) => el.Lessons.length >= 5 && !Lodash.isEmpty(el.instructorIds))
         .map(({ id, title, description, instructorIds }) => ({
             id,
             title,

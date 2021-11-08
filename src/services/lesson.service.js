@@ -4,6 +4,7 @@ import Lodash from 'lodash'
 import { Lesson } from '../models/lesson'
 import { Homework } from '../models/homework'
 import { File } from '../models/file'
+import { Course } from '../models/course'
 
 export const getLessonWithFiles = (id) => {
     return Lesson.findOne({
@@ -61,6 +62,16 @@ export const createLesson = (courseId, title, description) => {
     return Lesson.create({ courseId, title, description })
 }
 
+export const findLessonPerCourseByTitle = (courseId, title) => {
+    return Lesson.findOne({
+        where: {
+            courseId,
+            title,
+        },
+        attributes: ['id', 'title'],
+    })
+}
+
 export const updateLesson = (id, title, description) => {
     return Lesson.update({ title, description }, { where: { id } })
 }
@@ -84,4 +95,17 @@ export const removeLessonsWithRelations = async (lessons) => {
     )
 
     return Lesson.destroy({ where: { id: lessonsIds } })
+}
+
+export const findCourseFromLessonId = (id) => {
+    return Lesson.findOne({
+        where: { id },
+        include: [
+            {
+                model: Course,
+                attributes: ['id'],
+                required: false,
+            },
+        ],
+    })
 }
