@@ -1,30 +1,22 @@
-import Sequelize from 'sequelize'
-import { sequelize } from '../db/db'
+import DataTypes from 'sequelize'
 
-class FilesModel extends Sequelize.Model {}
-
-export const File = FilesModel.init(
-    {
+export const FileModel = (sequelize, DataTypes = DataTypes) =>
+    sequelize.define('Files', {
         id: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             primaryKey: true,
-            defaultValue: Sequelize.UUIDV4,
+            defaultValue: DataTypes.UUIDV4,
         },
         originalname: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         sourceId: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
         },
         mimetype: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         size: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
         },
-    },
-    {
-        modelName: 'Files',
-        sequelize,
-    }
-)
+    })

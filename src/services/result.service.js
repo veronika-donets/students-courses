@@ -1,7 +1,5 @@
 import Lodash from 'lodash'
-import { Result } from '../models/result'
-import { Homework } from '../models/homework'
-import { User } from '../models/user'
+import { Homework, Result, User } from '../../index'
 
 export const createResult = async (courseId, studentId) => {
     return Result.create({ courseId, studentId })

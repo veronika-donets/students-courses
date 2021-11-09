@@ -4,11 +4,8 @@ import jwt from 'jsonwebtoken'
 import jwt_decode from 'jwt-decode'
 import { removeResults } from './result.service'
 import { removeHomeworksWithRelations } from './homework.service'
-import { File } from '../models/file'
 import Lodash from 'lodash'
-import { User } from '../models/user'
-import { Result } from '../models/result'
-import { Homework } from '../models/homework'
+import { Homework, Result, User, File } from '../../index'
 
 export const getUserByEmail = (userEmail) => {
     const email = userEmail ? userEmail.toLowerCase() : ''
@@ -78,22 +75,6 @@ export const getUserIdFromToken = async (token) => {
 
 export const createUser = async ({ firstName, lastName, email, password, agreeTOS }) => {
     return User.create({ firstName, lastName, email, password, agreeTOS })
-}
-
-export const hashPassword = async (password) => {
-    const salt = await bcrypt.genSalt(6)
-
-    if (!salt) {
-        throw new Error('Cannot encrypt a password')
-    }
-
-    const hash = await bcrypt.hash(password, salt)
-
-    if (!hash) {
-        throw new Error('Cannot generate hash')
-    }
-
-    return hash
 }
 
 export const updatePassword = (id, password) => {

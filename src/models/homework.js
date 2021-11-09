@@ -1,18 +1,15 @@
-import Sequelize from 'sequelize'
-import { sequelize } from '../db/db.js'
+import DataTypes from 'sequelize'
 import { VALIDATIONS } from '../helpers'
 
-class HomeworkModel extends Sequelize.Model {}
-
-export const Homework = HomeworkModel.init(
-    {
+export const HomeworkModel = (sequelize, DataTypes = DataTypes) =>
+    sequelize.define('Homeworks', {
         id: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             primaryKey: true,
-            defaultValue: Sequelize.UUIDV4,
+            defaultValue: DataTypes.UUIDV4,
         },
         lessonId: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 notEmpty: {
@@ -22,7 +19,7 @@ export const Homework = HomeworkModel.init(
             },
         },
         studentId: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 notEmpty: {
@@ -32,10 +29,10 @@ export const Homework = HomeworkModel.init(
             },
         },
         comment: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         mark: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             validate: {
                 is: {
                     args: VALIDATIONS.MARK,
@@ -43,9 +40,4 @@ export const Homework = HomeworkModel.init(
                 },
             },
         },
-    },
-    {
-        modelName: 'Homeworks',
-        sequelize,
-    }
-)
+    })

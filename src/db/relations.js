@@ -1,12 +1,6 @@
-import { sequelize } from './db'
-import { User } from '../models/user'
-import { Homework } from '../models/homework'
-import { Course } from '../models/course'
-import { Lesson } from '../models/lesson'
-import { File } from '../models/file'
-import { Result } from '../models/result'
+export async function defineDbRelations(db, Models) {
+    const { Course, Homework, Lesson, User, File, Result } = Models
 
-export async function defineDbRelations() {
     User.hasMany(Homework, { foreignKey: 'studentId' })
     Homework.belongsTo(User, { foreignKey: 'studentId' })
 
@@ -28,5 +22,5 @@ export async function defineDbRelations() {
     User.hasMany(Result, { foreignKey: 'studentId' })
     Result.belongsTo(User, { foreignKey: 'studentId' })
 
-    await sequelize.sync()
+    await db.sync()
 }

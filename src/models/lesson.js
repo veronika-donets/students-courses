@@ -1,17 +1,14 @@
-import Sequelize from 'sequelize'
-import { sequelize } from '../db/db.js'
+import DataTypes from 'sequelize'
 
-class LessonModel extends Sequelize.Model {}
-
-export const Lesson = LessonModel.init(
-    {
+export const LessonModel = (sequelize, DataTypes = DataTypes) =>
+    sequelize.define('Lessons', {
         id: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             primaryKey: true,
-            defaultValue: Sequelize.UUIDV4,
+            defaultValue: DataTypes.UUIDV4,
         },
         courseId: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 notEmpty: {
@@ -21,7 +18,7 @@ export const Lesson = LessonModel.init(
             },
         },
         title: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notEmpty: {
@@ -31,11 +28,6 @@ export const Lesson = LessonModel.init(
             },
         },
         description: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
-    },
-    {
-        modelName: 'Lessons',
-        sequelize,
-    }
-)
+    })

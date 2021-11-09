@@ -1,17 +1,14 @@
-import Sequelize from 'sequelize'
-import { sequelize } from '../db/db'
+import DataTypes from 'sequelize'
 
-class ResultModel extends Sequelize.Model {}
-
-export const Result = ResultModel.init(
-    {
+export const ResultModel = (sequelize, DataTypes = DataTypes) =>
+    sequelize.define('Results', {
         id: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             primaryKey: true,
-            defaultValue: Sequelize.UUIDV4,
+            defaultValue: DataTypes.UUIDV4,
         },
         courseId: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 notEmpty: {
@@ -21,7 +18,7 @@ export const Result = ResultModel.init(
             },
         },
         studentId: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 notEmpty: {
@@ -31,18 +28,13 @@ export const Result = ResultModel.init(
             },
         },
         isCoursePassed: {
-            type: Sequelize.BOOLEAN,
+            type: DataTypes.BOOLEAN,
             defaultValue: false,
         },
         finalMark: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         feedback: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
-    },
-    {
-        modelName: 'Results',
-        sequelize,
-    }
-)
+    })
