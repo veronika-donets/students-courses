@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import bcrypt from 'bcryptjs'
 dotenv.config()
 
 export function getEnvVar(variable) {
@@ -9,6 +10,12 @@ export const USER_ROLES = Object.freeze({
     ADMIN: 'ADMIN',
     INSTRUCTOR: 'INSTRUCTOR',
     STUDENT: 'STUDENT',
+})
+
+export const ENVIRONMENT = Object.freeze({
+    DEV: 'DEV',
+    TEST: 'TEST',
+    PROD: 'PROD',
 })
 
 export const VALIDATIONS = Object.freeze({
@@ -41,4 +48,20 @@ export const getAwsFilePath = (sourceId, originalName) => {
     const fileName = originalName.replace(/\s+/g, '-')
 
     return `${sourceId}/${fileName}`
+}
+
+export const hashPassword = async (password) => {
+    const salt = await bcrypt.genSalt(6)
+
+    if (!salt) {
+        throw new Error('Cannot encrypt a password')
+    }
+
+    const hash = await bcrypt.hash(password, salt)
+
+    if (!hash) {
+        throw new Error('Cannot generate hash')
+    }
+
+    return hash
 }

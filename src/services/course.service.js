@@ -1,12 +1,7 @@
 import Sequelize from 'sequelize'
-import { sequelize } from '../db/db'
 import { removeLessonsWithRelations } from './lesson.service'
 import Lodash from 'lodash'
-import { Course } from '../models/course'
-import { Lesson } from '../models/lesson'
-import { Homework } from '../models/homework'
-import { File } from '../models/file'
-import { Result } from '../models/result'
+import { Course, Homework, Lesson, File, Result } from '../../index'
 
 export const getCourseById = (id) => {
     return Course.findOne({ where: { id } })
@@ -70,9 +65,9 @@ export const updateCourse = (id, title, description) => {
 export const assignInstructorToCourse = (courseId, instructorId) => {
     return Course.update(
         {
-            instructorIds: sequelize.fn(
+            instructorIds: Sequelize.fn(
                 'array_append',
-                sequelize.col('instructorIds'),
+                Sequelize.col('instructorIds'),
                 instructorId
             ),
         },
@@ -83,9 +78,9 @@ export const assignInstructorToCourse = (courseId, instructorId) => {
 export const unassignInstructorFromCourse = (courseId, instructorId) => {
     return Course.update(
         {
-            instructorIds: sequelize.fn(
+            instructorIds: Sequelize.fn(
                 'array_remove',
-                sequelize.col('instructorIds'),
+                Sequelize.col('instructorIds'),
                 instructorId
             ),
         },
@@ -96,9 +91,9 @@ export const unassignInstructorFromCourse = (courseId, instructorId) => {
 export const unassignInstructorFromAllCourses = (courseIds, instructorId) => {
     return Course.update(
         {
-            instructorIds: sequelize.fn(
+            instructorIds: Sequelize.fn(
                 'array_remove',
-                sequelize.col('instructorIds'),
+                Sequelize.col('instructorIds'),
                 instructorId
             ),
         },

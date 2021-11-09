@@ -1,10 +1,7 @@
 import { removeHomeworksWithRelations } from './homework.service'
 import { removeFilesWithS3 } from './file.service'
 import Lodash from 'lodash'
-import { Lesson } from '../models/lesson'
-import { Homework } from '../models/homework'
-import { File } from '../models/file'
-import { Course } from '../models/course'
+import { Homework, Lesson, File } from '../../index'
 
 export const getLessonWithFiles = (id) => {
     return Lesson.findOne({

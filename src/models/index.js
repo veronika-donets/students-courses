@@ -1,0 +1,6 @@
+export { UserModel } from '../models/user'
+export { HomeworkModel } from '../models/homework'
+export { CourseModel } from '../models/course'
+export { LessonModel } from '../models/lesson'
+export { FileModel } from '../models/file'
+export { ResultModel } from '../models/result'

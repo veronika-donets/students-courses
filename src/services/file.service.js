@@ -1,12 +1,8 @@
 import fs from 'fs'
 import path from 'path'
-import { File } from '../models/file'
-import { Homework } from '../models/homework'
-import { Lesson } from '../models/lesson'
-import { Result } from '../models/result'
-import { Course } from '../models/course'
 import { removeFilesFromS3, uploadToS3 } from './aws-S3.service'
 import Lodash from 'lodash'
+import { Course, Homework, Lesson, Result, File } from '../../index'
 
 export const getFileById = (id) => {
     return File.findOne({ where: { id } })
