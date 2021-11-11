@@ -1,9 +1,10 @@
-import { sequelize, dataTypes } from 'sequelize-test-helpers'
+import dataTypes from 'sequelize'
 import { UserModel } from '../../../src/models'
 import { expect } from '@jest/globals'
+import { mockSequelize } from '../__mock__/mockSequelize'
 
 describe('User model testing', () => {
-    const User = UserModel(sequelize, dataTypes)
+    const User = UserModel(mockSequelize, dataTypes)
     const user = new User()
 
     test('Check model name', () => {
@@ -27,5 +28,10 @@ describe('User model testing', () => {
                 expect(user).toHaveProperty(propName)
             })
         })
+    })
+
+    test('Check hooks', () => {
+        expect(User).toHaveProperty('beforeValidate')
+        expect(User).toHaveProperty('afterValidate')
     })
 })

@@ -1,56 +1,22 @@
-import { dataTypes as mockDataTypes, sequelize as mockSequelize } from 'sequelize-test-helpers'
-import { jest } from '@jest/globals'
+import dataTypes from 'sequelize'
 import express from 'express'
 import bodyParser from 'body-parser'
 import passport from 'passport'
 import { initModels } from '../../../src/db/db'
+import { mockSequelize } from './mockSequelize'
+import { mockUserModel } from './mockUser'
+import nock from 'nock'
+import { mockResultModel } from './mockResult'
 
-export const mockUserFindOne = jest.fn()
-export const mockUserCreate = jest.fn()
-export const mockUserUpdate = jest.fn()
-export const mockUserDestroy = jest.fn()
+export function launchMockApp() {
+    const { Course, Homework, Lesson, User, File, Result } = initModels(mockSequelize, dataTypes)
 
-export const mockCourseFindOne = jest.fn()
-export const mockCourseCreate = jest.fn()
-export const mockCourseUpdate = jest.fn()
-export const mockCourseDestroy = jest.fn()
-
-export const mockHomeworkFindOne = jest.fn()
-export const mockHomeworkCreate = jest.fn()
-export const mockHomeworkUpdate = jest.fn()
-export const mockHomeworkDestroy = jest.fn()
-
-export const mockLessonFindOne = jest.fn()
-export const mockLessonCreate = jest.fn()
-export const mockLessonUpdate = jest.fn()
-export const mockLessonDestroy = jest.fn()
-
-export const mockFileFindOne = jest.fn()
-export const mockFileCreate = jest.fn()
-export const mockFileUpdate = jest.fn()
-export const mockFileDestroy = jest.fn()
-
-export const mockResultFindOne = jest.fn()
-export const mockResultCreate = jest.fn()
-export const mockResultUpdate = jest.fn()
-export const mockResultDestroy = jest.fn()
-
-export const launchMockApp = () => {
-    mockSequelize.sync = jest.fn()
-
-    const { Course, Homework, Lesson, User, File, Result } = initModels(
-        mockSequelize,
-        mockDataTypes
-    )
-
-    User.findOne = mockUserFindOne
-    User.create = mockUserCreate
-    User.update = mockUserUpdate
-    User.destroy = mockUserDestroy
+    mockUserModel(User)
+    mockResultModel(Result)
 
     const Models = { Course, Homework, Lesson, User, File, Result }
 
-    return { sequelize: mockSequelize, dataTypes: mockDataTypes, Models }
+    return { sequelize: mockSequelize, dataTypes, Models }
 }
 
 export const createMockApp = () => {
@@ -62,3 +28,8 @@ export const createMockApp = () => {
 
     return app
 }
+
+export const mockSendGrid = () =>
+    nock('https://api.sendgrid.com/v3').post('/mail/send').reply(200, {
+        message: 'success',
+    })

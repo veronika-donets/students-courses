@@ -1,7 +1,7 @@
 import Lodash from 'lodash'
-import { Homework, Result, User } from '../../index'
+import { Result, User } from '../../index'
 
-export const createResult = async (courseId, studentId) => {
+export const createResult = (courseId, studentId) => {
     return Result.create({ courseId, studentId })
 }
 
@@ -13,8 +13,8 @@ export const getAllResultsByStudentId = (studentId) => {
     return Result.findAll({ where: { studentId } })
 }
 
-export const updateFeedback = (id, finalMark, isCoursePassed) => {
-    return Result.update({ finalMark, isCoursePassed }, { where: { id } })
+export const updateFeedback = (id, feedback) => {
+    return Result.update({ feedback }, { where: { id } })
 }
 
 export const updateFinalMark = (id, finalMark, isCoursePassed) => {
@@ -40,5 +40,5 @@ export const removeResults = async (results) => {
 
     const resultIds = results.map((el) => el.id)
 
-    return Homework.destroy({ where: { id: resultIds } })
+    return Result.destroy({ where: { id: resultIds } })
 }

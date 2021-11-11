@@ -50,14 +50,14 @@ export const getAwsFilePath = (sourceId, originalName) => {
     return `${sourceId}/${fileName}`
 }
 
-export const hashPassword = async (password) => {
-    const salt = await bcrypt.genSalt(6)
+export const hashPassword = (password) => {
+    const salt = bcrypt.genSaltSync(6)
 
     if (!salt) {
         throw new Error('Cannot encrypt a password')
     }
 
-    const hash = await bcrypt.hash(password, salt)
+    const hash = bcrypt.hashSync(password, salt)
 
     if (!hash) {
         throw new Error('Cannot generate hash')

@@ -32,7 +32,7 @@ router.put(
                     .json({ message: 'Feedback can be given only for completed course' })
             }
 
-            await updateFeedback(result.id)
+            await updateFeedback(result.id, feedback)
 
             res.json({ message: 'Feedback has been successfully given' })
         } catch (e) {
