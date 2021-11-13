@@ -1,7 +1,7 @@
 import { removeHomeworksWithRelations } from './homework.service'
 import { removeFilesWithS3 } from './file.service'
 import Lodash from 'lodash'
-import { Homework, Lesson, File } from '../../index'
+import { Homework, Lesson, File, Course } from '../../index'
 
 export const getLessonWithFiles = (id) => {
     return Lesson.findOne({
@@ -77,7 +77,10 @@ export const removeLessonsWithRelations = async (lessons) => {
     if (Lodash.isEmpty(lessons)) return
 
     const lessonsIds = lessons.map((el) => el.id)
-    const lessonFiles = lessons.map((el) => el.Files).flat(1)
+    const lessonFiles = lessons
+        .filter((el) => el.Files)
+        .map((el) => el.Files)
+        .flat(1)
 
     await removeFilesWithS3(lessonFiles)
 

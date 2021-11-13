@@ -12,13 +12,7 @@ describe('File model testing', () => {
     })
 
     describe('Check model properties', () => {
-        const props = [
-            'id',
-            'originalname',
-            'sourceId',
-            'mimetype',
-            'size',
-        ]
+        const props = ['id', 'originalname', 'sourceId', 'mimetype', 'size']
 
         props.forEach((propName) => {
             test(`Check property '${propName}'`, () => {

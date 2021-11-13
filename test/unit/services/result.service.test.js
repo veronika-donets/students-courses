@@ -4,8 +4,11 @@ import faker from 'faker'
 import {
     createResult,
     getAllResultsByStudentId,
-    getResultByCredentials, getStudentsPerCourse, removeResults,
-    updateFeedback, updateFinalMark,
+    getResultByCredentials,
+    getStudentsPerCourse,
+    removeResults,
+    updateFeedback,
+    updateFinalMark,
 } from '../../../src/services/result.service'
 import { getMockResultList, mockResult, randomFeedback, randomMark } from '../__mock__/mockResult'
 
@@ -18,7 +21,7 @@ describe('Result service testing', () => {
 
     beforeEach(() => jest.clearAllMocks())
 
-    test('Create Result', async() => {
+    test('Create Result', async () => {
         const courseId = faker.datatype.uuid()
         const studentId = faker.datatype.uuid()
 
@@ -33,7 +36,7 @@ describe('Result service testing', () => {
         expect(result.feedback).toBeNull()
     })
 
-    test('get Result By Credentials', async() => {
+    test('get Result By Credentials', async () => {
         const courseId = faker.datatype.uuid()
         const studentId = faker.datatype.uuid()
 
@@ -48,16 +51,16 @@ describe('Result service testing', () => {
         expect(result.feedback).toBe(mockResult.feedback)
     })
 
-    test('get All Results ByStudentId', async() => {
+    test('get All Results ByStudentId', async () => {
         const studentId = faker.datatype.uuid()
         const results = await getAllResultsByStudentId(studentId)
-        const isMatch = results.every(res => res.studentId === studentId)
+        const isMatch = results.every((res) => res.studentId === studentId)
 
         expect(spyResultFindAll).toHaveBeenCalledTimes(1)
         expect(isMatch).toBe(true)
     })
 
-    test('update Feedback', async() => {
+    test('update Feedback', async () => {
         const id = mockResult.id
 
         const result = await updateFeedback(id, randomFeedback)
@@ -70,7 +73,7 @@ describe('Result service testing', () => {
         expect(result.finalMark).toBe(mockResult.finalMark)
     })
 
-    test('update Final Mark', async() => {
+    test('update Final Mark', async () => {
         const id = mockResult.id
         const finalMark = randomMark
         const isCoursePassed = faker.datatype.boolean()
@@ -85,20 +88,20 @@ describe('Result service testing', () => {
         expect(result.finalMark).toBe(finalMark)
     })
 
-    test('get Students Per Course', async() => {
+    test('get Students Per Course', async () => {
         const courseId = faker.datatype.uuid()
         const results = await getStudentsPerCourse(courseId)
-        const isMatch = results.every(res => res.courseId === courseId)
+        const isMatch = results.every((res) => res.courseId === courseId)
 
         expect(spyResultFindAll).toHaveBeenCalledTimes(1)
         expect(isMatch).toBe(true)
     })
 
-    test('remove Results', async() => {
+    test('remove Results', async () => {
         const results = getMockResultList(mockResult)
         const result = await removeResults(results)
 
         expect(spyResultDestroy).toHaveBeenCalledTimes(1)
-        expect(result).toStrictEqual([ 1 ])
+        expect(result).toStrictEqual([1])
     })
 })

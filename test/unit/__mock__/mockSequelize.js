@@ -65,9 +65,10 @@ export const mockSequelize = {
         })
 
         model.addHook = (hookType, name, hook) => {
-            return typeof name === 'function' ? attachHook(hookType)(name) : attachHook(hookType)(hook)
+            return typeof name === 'function'
+                ? attachHook(hookType)(name)
+                : attachHook(hookType)(hook)
         }
-
 
         model.hook = model.addHook
 

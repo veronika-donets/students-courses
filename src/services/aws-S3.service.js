@@ -1,12 +1,18 @@
 import AWS from 'aws-sdk'
-import { getAwsFilePath, getEnvVar } from '../helpers'
+import { ENVIRONMENT, getAwsFilePath, getEnvVar } from '../helpers'
 import fs from 'fs'
+import { initMockBucket } from '../../test/unit/__mock__/mockAws-S3'
 
-const s3bucket = new AWS.S3({
-    accessKeyId: getEnvVar('IAM_USER_KEY'),
-    secretAccessKey: getEnvVar('IAM_USER_SECRET'),
-    Bucket: getEnvVar('BUCKET_NAME'),
-})
+export const initAWSBucket = () => {
+    return new AWS.S3({
+        accessKeyId: getEnvVar('IAM_USER_KEY'),
+        secretAccessKey: getEnvVar('IAM_USER_SECRET'),
+        Bucket: getEnvVar('BUCKET_NAME'),
+    })
+}
+
+export const s3bucket =
+    process.env.NODE_ENV === ENVIRONMENT.TEST ? initMockBucket() : initAWSBucket()
 
 export const uploadToS3 = async (file, sourceId) => {
     const { path, originalname, mimetype, size } = file

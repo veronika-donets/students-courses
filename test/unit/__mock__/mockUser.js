@@ -11,7 +11,7 @@ export const mockUser = {
     email: faker.internet.email(),
     password: hashedPassword,
     decryptedPassword: mockUserPassword,
-    isEmailVerified: faker.datatype.boolean(),
+    isEmailVerified: false,
     role: faker.name.jobType(),
     agreeTOS: faker.datatype.boolean(),
 }

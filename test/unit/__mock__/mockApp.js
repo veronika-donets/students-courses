@@ -7,12 +7,20 @@ import { mockSequelize } from './mockSequelize'
 import { mockUserModel } from './mockUser'
 import nock from 'nock'
 import { mockResultModel } from './mockResult'
+import { mockCourseModel } from './mockCourse'
+import { mockHomeworkModel } from './mockHomework'
+import { mockLessonModel } from './mockLesson'
+import { mockFileModel } from './mockFile'
 
 export function launchMockApp() {
     const { Course, Homework, Lesson, User, File, Result } = initModels(mockSequelize, dataTypes)
 
     mockUserModel(User)
+    mockCourseModel(Course, Lesson, Homework, File)
     mockResultModel(Result)
+    mockFileModel(File, Homework, Lesson)
+    mockHomeworkModel(Homework, File, Lesson)
+    mockLessonModel(Lesson, Homework, File)
 
     const Models = { Course, Homework, Lesson, User, File, Result }
 

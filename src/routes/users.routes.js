@@ -17,7 +17,7 @@ import jwt_decode from 'jwt-decode'
 import passport from '../config/passport'
 import { USER_ROLES } from '../helpers'
 import {
-    getCoursesByInstructorId,
+    findCoursesByInstructorId,
     unassignInstructorFromAllCourses,
 } from '../services/course.service'
 
@@ -93,21 +93,20 @@ router.post('/reset-password', async (req, res) => {
 
         res.status(200).json({ message: 'Reset password email has been sent' })
     } catch {
-        return res.status(400).json({ message: 'Reset password failed' })
+        return res.status(500).json({ message: 'Reset password failed' })
     }
 })
 
 router.post('/set-password', async (req, res) => {
     try {
-        const { key, password, token } = req.body
-        const serverKey = process.env.AUTH_SECRET_KEY
-
-        if (key !== serverKey) {
-            return res.status(403).json({ message: "Secret keys don't match" })
-        }
+        const { password, token } = req.body
 
         if (!req.body.token) {
-            return res.status(403).json({ message: 'User token is not provided' })
+            return res.status(404).json({ message: 'User token is not provided' })
+        }
+
+        if (!req.body.password) {
+            return res.status(404).json({ message: 'New password is not provided' })
         }
 
         const decoded = jwt_decode(token)
@@ -115,23 +114,26 @@ router.post('/set-password', async (req, res) => {
         const user = await getUserById(id)
 
         if (!user) {
-            return res.status(400).json({ message: 'User not found' })
+            return res.status(404).json({ message: 'User not found' })
         }
 
         await updatePassword(id, password)
 
-        res.json({ message: 'Reset password success' })
+        res.json({ message: 'Update password success' })
     } catch (e) {
-        res.status(400).json({ message: 'Reset password failed' })
+        res.status(500).json({ message: 'Update password failed' })
     }
 })
 
 router.post('/verify/email/send', async (req, res) => {
     try {
-        const userEmail = req.body.email
-        const email = userEmail ? userEmail.toLowerCase() : undefined
+        const email = req.body.email
 
-        const user = await getUserByEmail(email)
+        if (!email || typeof email !== 'string') {
+            return res.status(404).json({ message: 'Email is invalid or not provided' })
+        }
+
+        const user = await getUserByEmail(email.toLowerCase())
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' })
@@ -146,18 +148,13 @@ router.post('/verify/email/send', async (req, res) => {
 
         res.status(200).json({ message: 'Verification email has been sent' })
     } catch (e) {
-        res.status(403).json({ message: 'Sending email verification failed' })
+        res.status(500).json({ message: 'Sending email verification failed' })
     }
 })
 
 router.post('/verify/email/confirm', async (req, res) => {
     try {
-        const { key, token } = req.body
-        const serverKey = process.env.AUTH_SECRET_KEY
-
-        if (key !== serverKey) {
-            return res.status(403).json({ message: "Secret keys don't match" })
-        }
+        const { token } = req.body
 
         if (!req.body.token) {
             return res.status(403).json({ message: 'User token is not provided' })
@@ -188,7 +185,7 @@ router.post('/verify/email/confirm', async (req, res) => {
 
         res.json({ message: 'Email verification success' })
     } catch (e) {
-        res.status(400).json({ message: 'Email verification failed' })
+        res.status(500).json({ message: 'Email verification failed' })
     }
 })
 
@@ -199,7 +196,7 @@ router.put('/role', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) 
         const userId = await getUserIdFromToken(jwt)
 
         if (!id || !role) {
-            return res.status(400).json({ message: 'User id or role is not provided' })
+            return res.status(404).json({ message: 'User id or role is not provided' })
         }
 
         const user = await getUserById(id)
@@ -216,16 +213,19 @@ router.put('/role', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) 
 
         res.json({ message: 'Update user role success' })
     } catch (e) {
-        res.status(400).json({ message: 'Update user role failed' })
+        res.status(500).json({ message: 'Update user role failed' })
     }
 })
 
 router.post('/token', async (req, res) => {
     try {
-        const userEmail = req.body.email
-        const email = userEmail ? userEmail.toLowerCase() : undefined
+        const email = req.body.email
 
-        const user = await getUserByEmail(email)
+        if (!email || typeof email !== 'string') {
+            return res.status(404).json({ message: 'Email is invalid or not provided' })
+        }
+
+        const user = await getUserByEmail(email.toLowerCase())
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' })
@@ -235,7 +235,7 @@ router.post('/token', async (req, res) => {
 
         res.status(200).json({ token })
     } catch (e) {
-        res.status(400).json({ message: 'Sending email verification failed' })
+        res.status(500).json({ message: 'Cannot generate token' })
     }
 })
 
@@ -244,7 +244,7 @@ router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) =
         const { email } = req.query
 
         if (!email) {
-            return res.status(400).json({ message: 'User email is not provided' })
+            return res.status(404).json({ message: 'User email is not provided' })
         }
 
         const user = await getUserByEmailWithRelations(email)
@@ -256,7 +256,7 @@ router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) =
         }
 
         if (role === USER_ROLES.INSTRUCTOR) {
-            const courses = await getCoursesByInstructorId(id)
+            const courses = await findCoursesByInstructorId(id)
             const courseIds = courses.map((el) => el.id)
 
             await unassignInstructorFromAllCourses(courseIds, id)
@@ -266,7 +266,7 @@ router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) =
 
         res.json({ message: 'User has been successfully removed' })
     } catch (e) {
-        res.status(400).json({ message: 'Cannot remove user' })
+        res.status(500).json({ message: 'Cannot remove user' })
     }
 })
 
@@ -280,11 +280,10 @@ router.get(
             const userId = await getUserIdFromToken(jwt)
             const user = await getUserById(userId)
 
-            const { id, firstName, lastName, email, isEmailVerified, role } = user
+            const { firstName, lastName, email, isEmailVerified, role } = user
 
             res.json({
                 user: {
-                    id,
                     firstName,
                     lastName,
                     email,
@@ -293,7 +292,7 @@ router.get(
                 },
             })
         } catch {
-            res.status(400).json({ message: 'Cannot get user' })
+            res.status(500).json({ message: 'Cannot get user' })
         }
     }
 )

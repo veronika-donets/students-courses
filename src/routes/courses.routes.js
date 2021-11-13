@@ -229,7 +229,7 @@ router.get(
             const { role } = await getUserById(userId)
 
             if (role === USER_ROLES.INSTRUCTOR) {
-                const courses = await findCoursesByInstructorId(userId, role)
+                const courses = await findCoursesByInstructorId(userId)
 
                 return res.json({ courses })
             }

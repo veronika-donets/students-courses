@@ -31,18 +31,20 @@ export const mockResultModel = (Result) => {
         return new Promise((resolve) => resolve(getMockResultList(mockResult, where)))
     }
     Result.create = (params) => {
-        return new Promise((resolve) => resolve({
-            id: mockResult.id,
-            isCoursePassed: false,
-            finalMark: null,
-            feedback: null,
-            ...params
-        }))
+        return new Promise((resolve) =>
+            resolve({
+                id: mockResult.id,
+                isCoursePassed: false,
+                finalMark: null,
+                feedback: null,
+                ...params,
+            })
+        )
     }
     Result.update = (params) => {
         return new Promise((resolve) => resolve({ ...mockResult, ...params }))
     }
     Result.destroy = () => {
-        return new Promise((resolve) => resolve([ 1 ]))
+        return new Promise((resolve) => resolve([1]))
     }
 }

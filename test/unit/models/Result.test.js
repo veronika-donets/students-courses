@@ -12,14 +12,7 @@ describe('Result model testing', () => {
     })
 
     describe('Check model properties', () => {
-        const props = [
-            'id',
-            'courseId',
-            'studentId',
-            'isCoursePassed',
-            'finalMark',
-            'feedback',
-        ]
+        const props = ['id', 'courseId', 'studentId', 'isCoursePassed', 'finalMark', 'feedback']
 
         props.forEach((propName) => {
             test(`Check property '${propName}'`, () => {
