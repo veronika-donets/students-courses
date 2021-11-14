@@ -1,24 +1,7 @@
 import faker from 'faker'
-import { getMockFileList, mockFile } from './mockFile'
+import { getMockFileList } from './mockFile'
 import Lodash from 'lodash'
-import { mockLesson } from './mockLesson'
-
-export const randomMark = faker.random.arrayElement([
-    faker.datatype.number({ max: 100, min: 0 }),
-    null,
-])
-export const randomComment = faker.random.arrayElement([
-    faker.lorem.sentences(faker.datatype.number({ max: 10, min: 0 })),
-    null,
-])
-
-export const mockHomework = {
-    id: faker.datatype.uuid(),
-    lessonId: faker.datatype.uuid(),
-    studentId: faker.datatype.uuid(),
-    mark: randomMark,
-    comment: randomComment,
-}
+import { mockFile, mockHomework, mockLesson, randomComment, randomMark } from './mockResponseData'
 
 const randomHomeworkId = faker.datatype.uuid()
 
@@ -40,7 +23,7 @@ export const getMockHomeworkListWithFiles = (mockHomework, { lessonId }) => {
     if (lessonId.isArray) {
         return lessonId.map((id) => ({ ...mockHomework, lessonId: id, Files: files }))
     }
-    return { ...mockHomework, lessonId, Files: files }
+    return Array.from({ length: 2 }, () => ({ ...mockHomework, lessonId, Files: files }))
 }
 
 export const mockHomeworkModel = (Homework, File, Lesson) => {
@@ -50,14 +33,14 @@ export const mockHomeworkModel = (Homework, File, Lesson) => {
                 if (el.model === File) {
                     const files = Array.from({ length: 3 }, () => ({
                         ...mockFile,
-                        sourceId: where.id,
+                        //sourceId: where.id,
                     }))
                     return { Files: files }
                 }
                 if (el.model === Lesson) {
                     const lessons = Array.from({ length: 3 }, () => ({
                         ...mockLesson,
-                        homeworkId: where.id,
+                        //homeworkId: where.id,
                     }))
                     return { Lessons: lessons }
                 }

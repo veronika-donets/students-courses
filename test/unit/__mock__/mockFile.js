@@ -1,20 +1,5 @@
-import faker from 'faker'
-import { VALIDATIONS } from '../../../src/helpers'
 import Lodash from 'lodash'
-import { mockLesson } from './mockLesson'
-import { mockHomework } from './mockHomework'
-import { mockCourse } from './mockCourse'
-import { mockResult } from './mockResult'
-
-export const randomMimetype = faker.random.arrayElement([...VALIDATIONS.FILE_TYPE])
-
-export const mockFile = {
-    id: faker.datatype.uuid(),
-    originalname: faker.datatype.string(),
-    sourceId: faker.datatype.uuid(),
-    mimetype: randomMimetype,
-    size: faker.datatype.number({ min: 0, max: 50000 }),
-}
+import { mockFile, mockHomework, mockLesson, mockResult, mockCourse } from './mockResponseData'
 
 export const getMockFileList = (mockFile, where, count) => {
     const file = { ...mockFile, ...where }

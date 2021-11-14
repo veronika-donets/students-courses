@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-import { Course, Result, Lesson } from '../../../index'
+import { Course, Result } from '../../../index'
 import faker from 'faker'
 import {
     assignInstructorToCourse,
@@ -14,9 +14,9 @@ import {
     unassignInstructorFromCourse,
     updateCourse,
 } from '../../../src/services/course.service'
-import { getMockCourseWithLesson, mockCourse } from '../__mock__/mockCourse'
+import { getMockCourseWithLesson } from '../__mock__/mockCourse'
 import Lodash from 'lodash'
-import { mockLesson } from '../__mock__/mockLesson'
+import { mockCourse, mockLesson } from '../__mock__/mockResponseData'
 
 describe('Course service testing', () => {
     const spyCourseCreate = jest.spyOn(Course, 'create')
@@ -24,7 +24,6 @@ describe('Course service testing', () => {
     const spyCourseFindAll = jest.spyOn(Course, 'findAll')
     const spyCourseUpdate = jest.spyOn(Course, 'update')
     const spyCourseDestroy = jest.spyOn(Course, 'destroy')
-    const spyLessonDestroy = jest.spyOn(Lesson, 'destroy')
     const spyResultFindAll = jest.spyOn(Result, 'findAll')
 
     beforeEach(() => jest.clearAllMocks())
@@ -140,7 +139,6 @@ describe('Course service testing', () => {
         const result = await removeCourseWithRelations(testCourse)
 
         expect(spyCourseDestroy).toHaveBeenCalledTimes(1)
-        expect(spyLessonDestroy).toHaveBeenCalledTimes(1)
         expect(result).toStrictEqual([1])
     })
 })

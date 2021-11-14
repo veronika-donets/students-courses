@@ -20,7 +20,7 @@ export function launchMockApp() {
     mockResultModel(Result)
     mockFileModel(File, Homework, Lesson)
     mockHomeworkModel(Homework, File, Lesson)
-    mockLessonModel(Lesson, Homework, File)
+    mockLessonModel(Lesson, Homework, File, Course)
 
     const Models = { Course, Homework, Lesson, User, File, Result }
 

@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 import { File } from '../../../index'
 import faker from 'faker'
-import { getMockFileList, mockFile, randomMimetype } from '../__mock__/mockFile'
+import { getMockFileList } from '../__mock__/mockFile'
 import {
     createUploadedFile,
     createUploadedFilesWithS3,
@@ -10,6 +10,7 @@ import {
     removeFilesWithS3,
 } from '../../../src/services/file.service'
 import { s3bucket } from '../../../src/services/aws-S3.service'
+import { mockFile, randomMimetype } from '../__mock__/mockResponseData'
 
 describe('File service testing', () => {
     const spyFileCreate = jest.spyOn(File, 'create')

@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 import { File, Lesson } from '../../../index'
 import faker from 'faker'
-import { getMockLessonListWithFiles, mockLesson } from '../__mock__/mockLesson'
+import { getMockLessonListWithFiles } from '../__mock__/mockLesson'
 import {
     createLesson,
     findLessonPerCourseByTitle,
@@ -11,7 +11,7 @@ import {
     removeLessonsWithRelations,
     updateLesson,
 } from '../../../src/services/lesson.service'
-import { mockFile } from '../__mock__/mockFile'
+import { mockFile, mockLesson } from '../__mock__/mockResponseData'
 
 describe('Lesson service testing', () => {
     const spyLessonCreate = jest.spyOn(Lesson, 'create')
@@ -55,7 +55,6 @@ describe('Lesson service testing', () => {
 
         expect(spyLessonFindOne).toHaveBeenCalledTimes(1)
         expect(lesson.Homeworks).toBeDefined()
-        expect(lesson.Homeworks.Files).toBeDefined()
         expect(lesson.Files).toBeDefined()
     })
 
@@ -82,9 +81,7 @@ describe('Lesson service testing', () => {
         const lesson = await findLessonPerCourseByTitle(courseId, title)
 
         expect(spyLessonFindOne).toHaveBeenCalledTimes(1)
-        expect(lesson.id).toBe(mockLesson.id)
-        expect(lesson.courseId).toBe(courseId)
-        expect(lesson.title).toBe(title)
+        expect(lesson).toBeNull()
     })
 
     test('remove Lessons With Relations', async () => {

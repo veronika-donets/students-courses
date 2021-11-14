@@ -13,8 +13,8 @@ import {
 } from '../../../src/services/user.service'
 import { User } from '../../../index'
 import faker from 'faker'
-import { mockUser } from '../__mock__/mockUser'
 import { USER_ROLES } from '../../../src/helpers'
+import { mockUser } from '../__mock__/mockResponseData'
 
 describe('User service testing', () => {
     const spyUserCreate = jest.spyOn(User, 'create')

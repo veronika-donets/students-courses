@@ -2,12 +2,12 @@ import request from 'supertest'
 import { jest } from '@jest/globals'
 import { createMockApp, mockSendGrid } from '../__mock__/mockApp'
 import users from '../../../src/routes/users.routes'
-import { mockUser } from '../__mock__/mockUser'
 import faker from 'faker'
 import { User } from '../../../index'
 import { generateAuthToken } from '../../../src/services/user.service'
 import { USER_ROLES } from '../../../src/helpers'
 import { generateMockToken } from '../__mock__/mockAuthToken'
+import { mockUser } from '../__mock__/mockResponseData'
 
 describe('User routes testing', () => {
     let app

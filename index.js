@@ -7,7 +7,7 @@ import { defineDbRelations } from './src/db/relations'
 import DataTypes from 'sequelize'
 import { launchMockApp } from './test/unit/__mock__/mockApp'
 
-async function launchApp() {
+export async function launchApp() {
     dotenv.config()
 
     try {

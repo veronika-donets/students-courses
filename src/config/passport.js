@@ -5,10 +5,10 @@ import useMockPassport from '../../test/unit/__mock__/mockPassport'
 import passportjs from 'passport'
 
 export function useAppPassport(passport) {
-    const options = Object.freeze({
+    const options = {
         jwtFromRequest: ExtractJwt.fromHeader('jwt'),
         secretOrKey: process.env.AUTH_SECRET_KEY,
-    })
+    }
 
     passport.use(
         USER_ROLES.ADMIN,

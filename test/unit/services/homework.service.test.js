@@ -1,12 +1,7 @@
 import { jest } from '@jest/globals'
 import { Homework, File } from '../../../index'
 import faker from 'faker'
-import {
-    getMockHomeworkWithFiles,
-    mockHomework,
-    randomComment,
-    randomMark,
-} from '../__mock__/mockHomework'
+import { getMockHomeworkWithFiles } from '../__mock__/mockHomework'
 import {
     createHomework,
     getAllHomeworksPerCourse,
@@ -16,7 +11,7 @@ import {
     removeHomeworksWithRelations,
     updateHomework,
 } from '../../../src/services/homework.service'
-import { mockFile } from '../__mock__/mockFile'
+import { randomComment, randomMark, mockHomework, mockFile } from '../__mock__/mockResponseData'
 
 describe('Homework service testing', () => {
     const spyHomeworkCreate = jest.spyOn(Homework, 'create')

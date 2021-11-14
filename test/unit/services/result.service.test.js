@@ -10,7 +10,8 @@ import {
     updateFeedback,
     updateFinalMark,
 } from '../../../src/services/result.service'
-import { getMockResultList, mockResult, randomFeedback, randomMark } from '../__mock__/mockResult'
+import { getMockResultList } from '../__mock__/mockResult'
+import { mockResult, randomFeedback, randomMark } from '../__mock__/mockResponseData'
 
 describe('Result service testing', () => {
     const spyResultCreate = jest.spyOn(Result, 'create')

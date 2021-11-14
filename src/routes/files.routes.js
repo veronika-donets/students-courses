@@ -14,17 +14,19 @@ router.get(
         try {
             const { id } = req.params
 
-            const { originalname, sourceId, Homework, Lesson } = await getFileByIdWithSource(id)
+            const result = await getFileByIdWithSource(id)
 
-            if (!Homework && Lodash.isEmpty(Lesson.Course.Results)) {
+            const { originalname, sourceId, Homeworks, Lessons } = result
+
+            if (!Homeworks && Lodash.isEmpty(Lessons.Course.Results)) {
                 return res.status(403).json({ message: 'You are not authorized to see this file' })
             }
 
             const file = await downloadFromS3(originalname, sourceId)
 
             res.end(file.Body, 'binary')
-        } catch (e) {
-            res.status(404).json({ message: e.message + ' File not found' })
+        } catch {
+            res.status(500).json({ message: 'Cannot get file' })
         }
     }
 )

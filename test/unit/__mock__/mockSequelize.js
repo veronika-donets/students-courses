@@ -89,4 +89,5 @@ export const mockSequelize = {
         return model
     },
     sync: function () {},
+    authenticate: function () {},
 }

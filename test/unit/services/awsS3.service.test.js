@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 import { downloadFromS3, removeFromS3, uploadToS3 } from '../../../src/services/aws-S3.service'
 import faker from 'faker'
-import { randomMimetype } from '../__mock__/mockFile'
+import { randomMimetype } from '../__mock__/mockResponseData'
 
 describe('AWS S3 service testing', () => {
     beforeEach(() => {

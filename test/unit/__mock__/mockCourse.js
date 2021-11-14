@@ -1,19 +1,9 @@
 import faker from 'faker'
 import Lodash from 'lodash'
-import { mockLesson } from './mockLesson'
-
-const randomLength = faker.datatype.number({ min: 0, max: 20 })
-const idList = Array.from({ length: randomLength }, () => faker.datatype.uuid())
-
-export const mockCourse = {
-    id: faker.datatype.uuid(),
-    title: faker.lorem.sentences(1),
-    description: faker.lorem.sentences(faker.datatype.number({ max: 10, min: 0 })),
-    instructorIds: faker.random.arrayElement([idList, null]),
-}
+import { mockCourse, mockCourseIdWithoutInstructor, mockLesson } from './mockResponseData'
 
 export const getMockCourseWithLesson = (mockCourse, mockLesson, where) => {
-    const randomLength = faker.datatype.number({ min: 0, max: 20 })
+    const randomLength = faker.datatype.number({ min: 5, max: 20 })
     const lessons = Array.from({ length: randomLength }, () => ({ ...mockLesson }))
     return { ...mockCourse, ...where, Lessons: lessons }
 }
@@ -24,10 +14,13 @@ export const getMockCourseList = (mockCourse, mockLesson, where) => {
 
 export const mockCourseModel = (Course, Lesson) => {
     Course.findOne = ({ where, include }) => {
+        if (where && where.id === mockCourseIdWithoutInstructor) {
+            return new Promise((resolve) => resolve({ ...mockCourse, instructorIds: [], ...where }))
+        }
         if (!Lodash.isEmpty(include)) {
             const models = include.map((el) => {
                 if (el.model === Lesson) {
-                    const lessons = Array.from({ length: 3 }, () => ({
+                    const lessons = Array.from({ length: 5 }, () => ({
                         ...mockLesson,
                         courseId: where.id,
                     }))

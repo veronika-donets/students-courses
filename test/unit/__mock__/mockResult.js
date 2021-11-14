@@ -1,22 +1,4 @@
-import faker from 'faker'
-
-export const randomMark = faker.random.arrayElement([
-    faker.datatype.number({ max: 100, min: 0 }),
-    null,
-])
-export const randomFeedback = faker.random.arrayElement([
-    faker.lorem.sentences(faker.datatype.number({ max: 10, min: 0 })),
-    null,
-])
-
-export const mockResult = {
-    id: faker.datatype.uuid(),
-    courseId: faker.datatype.uuid(),
-    studentId: faker.datatype.uuid(),
-    isCoursePassed: faker.datatype.boolean(),
-    finalMark: randomMark,
-    feedback: randomFeedback,
-}
+import { mockResult } from './mockResponseData'
 
 export const getMockResultList = (mockResult, where) => {
     const result = { ...mockResult, ...where }

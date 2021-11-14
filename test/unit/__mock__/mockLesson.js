@@ -1,14 +1,6 @@
-import faker from 'faker'
 import Lodash from 'lodash'
-import { mockFile } from './mockFile'
-import { getMockHomeworkListWithFiles, mockHomework } from './mockHomework'
-
-export const mockLesson = {
-    id: faker.datatype.uuid(),
-    courseId: faker.datatype.uuid(),
-    title: faker.lorem.sentences(1),
-    description: faker.lorem.sentences(3),
-}
+import { getMockHomeworkListWithFiles } from './mockHomework'
+import { mockHomework, mockLesson, mockFile, mockCourse } from './mockResponseData'
 
 export const getMockLessonList = (mockLesson, where) => {
     const lesson = { ...mockLesson, ...where }
@@ -20,8 +12,11 @@ export const getMockLessonListWithFiles = (mockLesson, mockFile) => {
     return Array.from({ length: 3 }, () => ({ ...mockLesson, Files: files }))
 }
 
-export const mockLessonModel = (Lesson, Homework, File) => {
+export const mockLessonModel = (Lesson, Homework, File, Course) => {
     Lesson.findOne = ({ where, include }) => {
+        if (where.title) {
+            return new Promise((resolve) => resolve(null))
+        }
         if (!Lodash.isEmpty(include)) {
             const models = include.map((el) => {
                 if (el.model === File) {
@@ -36,6 +31,9 @@ export const mockLessonModel = (Lesson, Homework, File) => {
                         lessonId: where.id,
                     })
                     return { Homeworks: homeworks }
+                }
+                if (el.model === Course) {
+                    return { Course: mockCourse }
                 }
             })
             const attachedModels = models.reduce((res, el) => ({ ...res, ...el }), {})

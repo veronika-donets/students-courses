@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
+import Lodash from 'lodash'
 dotenv.config()
 
 export function getEnvVar(variable) {
@@ -39,7 +40,9 @@ export const VALIDATIONS = Object.freeze({
     ],
 })
 
-export const checkUnsupportedFormat = (files) => {
+export const checkUnsupportedFormat = (files = []) => {
+    if (Lodash.isEmpty(files)) return
+
     const unsupportedFormat = files.find((file) => !VALIDATIONS.FILE_TYPE.includes(file.mimetype))
     return Boolean(unsupportedFormat)
 }
