@@ -33,7 +33,7 @@ describe('Result routes testing', () => {
         const body = {
             courseId: faker.datatype.uuid(),
             studentId: faker.datatype.uuid(),
-            feedback: faker.lorem.sentences(faker.datatype.number({ max: 10, min: 0 })),
+            feedback: faker.lorem.sentences(faker.datatype.number({ max: 10, min: 1 })),
         }
 
         const response = await request(app)
@@ -41,8 +41,6 @@ describe('Result routes testing', () => {
             .send(body)
             .set({ jwt: instructorToken })
         const { message } = response.body
-
-        console.log('Put feedback', response.error)
 
         expect(response.statusCode).toBe(200)
         expect(spyResultUpdate).toBeCalledTimes(1)
