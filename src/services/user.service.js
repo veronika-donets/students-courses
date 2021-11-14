@@ -51,7 +51,7 @@ export const getUserByCredentials = async (email, password) => {
         throw new Error('Unable to login')
     }
 
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = bcrypt.compareSync(password, user.password)
 
     if (!isMatch) {
         throw new Error('Passwords not match')

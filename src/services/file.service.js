@@ -4,10 +4,6 @@ import { removeFilesFromS3, uploadToS3 } from './aws-S3.service'
 import Lodash from 'lodash'
 import { Course, Homework, Lesson, Result, File } from '../../index'
 
-export const getFileById = (id) => {
-    return File.findOne({ where: { id } })
-}
-
 export const getFileByIdWithSource = (id) => {
     return File.findOne({
         where: { id },

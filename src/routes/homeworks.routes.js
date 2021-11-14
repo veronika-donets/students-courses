@@ -88,7 +88,7 @@ router.post(
                 fileIds,
             })
         } catch (e) {
-            res.status(400).json({ message: e.message })
+            res.status(500).json({ message: e.message })
         } finally {
             await cleanUploadsFolder(req.files)
         }
@@ -108,7 +108,13 @@ router.put(
             const { files } = req
 
             if (!homeworkId) {
-                return res.status(400).json({ message: 'Homework id is not provided' })
+                return res.status(404).json({ message: 'Homework id is not provided' })
+            }
+
+            const hasUnsupportedFormat = checkUnsupportedFormat(files)
+
+            if (hasUnsupportedFormat) {
+                return res.status(400).json({ message: 'Unsupported file format' })
             }
 
             const studentId = await getUserIdFromToken(jwt)
@@ -124,7 +130,9 @@ router.put(
             }
 
             if (existedHomework.studentId !== studentId) {
-                return res.status(401).json({ message: 'Unauthorized' })
+                return res
+                    .status(403)
+                    .json({ message: 'You are not authorized to update this homework' })
             }
 
             await updateHomework(homeworkId, comment)
@@ -138,7 +146,7 @@ router.put(
 
             res.json({ message: 'Homework successfully updated' })
         } catch (e) {
-            res.status(400).json({ message: e.message })
+            res.status(500).json({ message: e.message })
         } finally {
             await cleanUploadsFolder(req.files)
         }
@@ -154,7 +162,7 @@ router.get(
             const { jwt } = req.headers
 
             if (!homeworkId) {
-                return res.status(400).json({ message: 'Homework id is not provided' })
+                return res.status(404).json({ message: 'Homework id is not provided' })
             }
 
             const userId = await getUserIdFromToken(jwt)
@@ -179,7 +187,7 @@ router.get(
 
             res.json({ homework })
         } catch {
-            res.status(400).json({ message: 'Cannot get homework' })
+            res.status(500).json({ message: 'Cannot get homework' })
         }
     }
 )
@@ -192,11 +200,11 @@ router.put(
             const { homeworkId, mark } = req.body
 
             if (!homeworkId) {
-                return res.status(400).json({ message: 'Homework id is not provided' })
+                return res.status(404).json({ message: 'Homework id is not provided' })
             }
 
             if (!mark) {
-                return res.status(400).json({ message: 'Mark is not provided' })
+                return res.status(404).json({ message: 'Mark is not provided' })
             }
 
             const homework = await getHomeworkWithLessonById(homeworkId)
@@ -207,7 +215,7 @@ router.put(
 
             await putMark(homeworkId, mark)
 
-            const { Lesson, studentId } = homework
+            const { Lessons: Lesson, studentId } = homework
 
             // Check if a student submit all homeworks to all lessons per course
 
@@ -247,7 +255,7 @@ router.put(
                 finalMark,
             })
         } catch (e) {
-            res.status(400).json({ message: e.message })
+            res.status(500).json({ message: e.message })
         }
     }
 )
@@ -258,7 +266,7 @@ router.delete('/', passport.authenticate([USER_ROLES.STUDENT]), async (req, res)
         const { jwt } = req.headers
 
         if (!id) {
-            return res.status(400).json({ message: 'Homework id is not provided' })
+            return res.status(404).json({ message: 'Homework id is not provided' })
         }
 
         const studentId = await getUserIdFromToken(jwt)
@@ -269,7 +277,9 @@ router.delete('/', passport.authenticate([USER_ROLES.STUDENT]), async (req, res)
         }
 
         if (homework.studentId !== studentId) {
-            return res.status(401).json({ message: 'Unauthorized' })
+            return res
+                .status(403)
+                .json({ message: 'You are not authorized to delete this homework' })
         }
 
         if (homework.mark) {
@@ -284,7 +294,7 @@ router.delete('/', passport.authenticate([USER_ROLES.STUDENT]), async (req, res)
             message: 'Homework has been removed',
         })
     } catch (e) {
-        res.status(400).json({ message: 'Cannot remove homework' })
+        res.status(500).json({ message: 'Cannot remove homework' })
     }
 })
 

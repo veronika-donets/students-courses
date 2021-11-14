@@ -26,7 +26,7 @@ router.post('/create', passport.authenticate([USER_ROLES.ADMIN]), async (req, re
 
         res.json({ id, title, description })
     } catch (e) {
-        res.status(400).json({ message: e.message })
+        res.status(500).json({ message: e.message })
     }
 })
 
@@ -34,11 +34,15 @@ router.put('/update', passport.authenticate([USER_ROLES.ADMIN]), async (req, res
     try {
         const { courseId, title, description } = req.body
 
+        if (!courseId) {
+            return res.status(404).json({ message: 'Course Id is not provided' })
+        }
+
         await updateCourse(courseId, title, description)
 
         res.json({ message: 'Course successfully updated' })
     } catch (e) {
-        res.status(400).json({ message: e.message })
+        res.status(500).json({ message: e.message })
     }
 })
 
@@ -114,7 +118,7 @@ router.post('/start', passport.authenticate([USER_ROLES.STUDENT]), async (req, r
         const { courseId } = req.body
 
         if (!courseId) {
-            return res.status(400).json({ message: 'Course id is not provided' })
+            return res.status(404).json({ message: 'Course id is not provided' })
         }
 
         const studentId = await getUserIdFromToken(jwt)
@@ -197,6 +201,10 @@ router.get('/', async (req, res) => {
         const { id } = req.query
         const { jwt } = req.headers
 
+        if (!id) {
+            return res.status(404).json({ message: 'Course id is not provided' })
+        }
+
         let isAdmin = false
 
         if (jwt) {
@@ -226,10 +234,11 @@ router.get(
         try {
             const { jwt } = req.headers
             const userId = await getUserIdFromToken(jwt)
+
             const { role } = await getUserById(userId)
 
             if (role === USER_ROLES.INSTRUCTOR) {
-                const courses = await findCoursesByInstructorId(userId, role)
+                const courses = await findCoursesByInstructorId(userId)
 
                 return res.json({ courses })
             }

@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize'
-import { ENVIRONMENT, getEnvVar } from '../helpers'
+import { getEnvVar } from '../helpers'
 import {
     CourseModel,
     FileModel,
@@ -10,18 +10,15 @@ import {
 } from '../models'
 
 export function defineDB(Db = Sequelize) {
-    if (process.env.NODE_ENV === ENVIRONMENT.TEST) {
-    } else {
-        const dbName = getEnvVar('DB_NAME')
-        const dbUser = getEnvVar('DB_USER')
-        const dbPass = getEnvVar('DB_PASS')
-        const options = {
-            host: getEnvVar('DB_HOST'),
-            dialect: 'postgres',
-        }
-
-        return new Db(dbName, dbUser, dbPass, options)
+    const dbName = getEnvVar('DB_NAME')
+    const dbUser = getEnvVar('DB_USER')
+    const dbPass = getEnvVar('DB_PASS')
+    const options = {
+        host: getEnvVar('DB_HOST'),
+        dialect: 'postgres',
     }
+
+    return new Db(dbName, dbUser, dbPass, options)
 }
 
 export async function connectToDB(db) {

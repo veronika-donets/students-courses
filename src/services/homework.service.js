@@ -1,6 +1,6 @@
 import Lodash from 'lodash'
 import { removeFiles } from './file.service'
-import { Homework, Lesson } from '../../index'
+import { Homework, Lesson, File } from '../../index'
 
 export const getHomeworkWithFilesById = (id) => {
     return Homework.findOne({

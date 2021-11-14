@@ -107,7 +107,7 @@ export const findAvailableCourses = async (limit, offset, isActive = true) => {
               include: [
                   {
                       model: Lesson,
-                      attributes: ['id'],
+                      attributes: ['id', 'title'],
                       required: false,
                   },
               ],
@@ -128,21 +128,13 @@ export const findAvailableCourses = async (limit, offset, isActive = true) => {
 
     return courses
         .filter((el) => el.Lessons.length >= 5 && !Lodash.isEmpty(el.instructorIds))
-        .map(({ id, title, description, instructorIds }) => ({
+        .map(({ id, title, description, instructorIds, Lessons }) => ({
             id,
             title,
             description,
             instructorIds,
+            Lessons,
         }))
-}
-
-export const findCoursesByInstructorId = (id) => {
-    return Course.findAll({
-        where: {
-            instructorIds: [id],
-        },
-        attributes: ['id', 'title', 'description', 'instructorIds'],
-    })
 }
 
 export const findStartedCourses = async (studentId) => {
@@ -171,13 +163,11 @@ export const removeCourseWithRelations = async (course) => {
     return Course.destroy({ where: { id } })
 }
 
-export const getCoursesByInstructorId = (id) => {
+export const findCoursesByInstructorId = (id) => {
     return Course.findAll({
         where: {
-            instructorIds: {
-                [Sequelize.Op.contains]: [id],
-            },
+            instructorIds: [id],
         },
-        attributes: ['id'],
+        attributes: ['id', 'title', 'description', 'instructorIds'],
     })
 }

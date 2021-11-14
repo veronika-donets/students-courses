@@ -93,6 +93,10 @@ router.get(
             const { id } = req.query
             const { jwt } = req.headers
 
+            if (!id) {
+                return res.status(404).json({ message: 'Lesson id is not provided' })
+            }
+
             const userId = await getUserIdFromToken(jwt)
             const user = await getUserById(userId)
 
@@ -122,7 +126,7 @@ router.get(
 
             res.json({ lesson })
         } catch {
-            res.status(400).json({ message: 'Cannot get lesson' })
+            res.status(500).json({ message: 'Cannot get lesson' })
         }
     }
 )
@@ -140,6 +144,12 @@ router.put(
 
             if (!id) {
                 return res.status(404).json({ message: 'Lesson id is not provided' })
+            }
+
+            const hasUnsupportedFormat = checkUnsupportedFormat(files)
+
+            if (hasUnsupportedFormat) {
+                return res.status(400).json({ message: 'Unsupported file format' })
             }
 
             const lesson = await getLessonWithFilesById(id)
@@ -182,7 +192,7 @@ router.delete('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) =
 
         res.json({ message: 'Lesson has been successfully removed' })
     } catch {
-        res.status(400).json({ message: 'Cannot remove lesson' })
+        res.status(500).json({ message: 'Cannot remove lesson' })
     }
 })
 

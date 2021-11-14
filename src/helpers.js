@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
+import Lodash from 'lodash'
 dotenv.config()
 
 export function getEnvVar(variable) {
@@ -39,7 +40,9 @@ export const VALIDATIONS = Object.freeze({
     ],
 })
 
-export const checkUnsupportedFormat = (files) => {
+export const checkUnsupportedFormat = (files = []) => {
+    if (Lodash.isEmpty(files)) return
+
     const unsupportedFormat = files.find((file) => !VALIDATIONS.FILE_TYPE.includes(file.mimetype))
     return Boolean(unsupportedFormat)
 }
@@ -50,14 +53,14 @@ export const getAwsFilePath = (sourceId, originalName) => {
     return `${sourceId}/${fileName}`
 }
 
-export const hashPassword = async (password) => {
-    const salt = await bcrypt.genSalt(6)
+export const hashPassword = (password) => {
+    const salt = bcrypt.genSaltSync(6)
 
     if (!salt) {
         throw new Error('Cannot encrypt a password')
     }
 
-    const hash = await bcrypt.hash(password, salt)
+    const hash = bcrypt.hashSync(password, salt)
 
     if (!hash) {
         throw new Error('Cannot generate hash')
