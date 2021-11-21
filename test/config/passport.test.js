@@ -1,10 +1,10 @@
 // import { jest } from '@jest/globals'
-import { useAppPassport } from '../../../src/auth/passport'
-import { USER_ROLES } from '../../../src/helpers'
+import { useAppPassport } from '../../src/auth/passport'
+import { USER_ROLES } from '../../src/helpers'
 import { Router } from 'express'
 import request from 'supertest'
 import { generateMockToken } from '../__mock__/mockAuthToken'
-import { createExpressApp } from '../../../src/app'
+import { createExpressApp } from '../../src/app'
 import { mockAdminId, mockInstructorId, mockStudentId } from '../__mock__/mockResponseData'
 
 describe('Passport testing', () => {

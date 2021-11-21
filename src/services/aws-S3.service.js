@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk'
 import { ENVIRONMENT, getAwsFilePath, getEnvVar } from '../helpers'
 import fs from 'fs'
-import { initMockBucket } from '../../test/unit/__mock__/mockAws-S3'
+import { initMockBucket } from '../../test/__mock__/mockAws-S3'
 
 export const initAWSBucket = () => {
     return new AWS.S3({

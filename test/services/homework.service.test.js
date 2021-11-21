@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-import { Homework, File } from '../../../index'
+import { Homework, File } from '../../index'
 import faker from 'faker'
 import { getMockHomeworkWithFiles } from '../__mock__/mockHomework'
 import {
@@ -10,7 +10,7 @@ import {
     putMark,
     removeHomeworksWithRelations,
     updateHomework,
-} from '../../../src/services/homework.service'
+} from '../../src/services/homework.service'
 import { randomComment, randomMark, mockHomework, mockFile } from '../__mock__/mockResponseData'
 
 describe('Homework service testing', () => {

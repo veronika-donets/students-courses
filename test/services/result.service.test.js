@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-import { Result } from '../../../index'
+import { Result } from '../../index'
 import faker from 'faker'
 import {
     createResult,
@@ -9,7 +9,7 @@ import {
     removeResults,
     updateFeedback,
     updateFinalMark,
-} from '../../../src/services/result.service'
+} from '../../src/services/result.service'
 import { getMockResultList } from '../__mock__/mockResult'
 import { mockResult, randomFeedback, randomMark } from '../__mock__/mockResponseData'
 

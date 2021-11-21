@@ -1,12 +1,12 @@
 import { jest } from '@jest/globals'
-import { File } from '../../../index'
+import { File } from '../../index'
 import { createMockApp } from '../__mock__/mockApp'
 import { generateMockToken } from '../__mock__/mockAuthToken'
-import { USER_ROLES } from '../../../src/helpers'
+import { USER_ROLES } from '../../src/helpers'
 import faker from 'faker'
 import request from 'supertest'
-import files from '../../../src/routes/files.routes'
-import passport from '../../../src/auth'
+import files from '../../src/routes/files.routes'
+import passport from '../../src/auth'
 
 describe('File routes testing', () => {
     let app

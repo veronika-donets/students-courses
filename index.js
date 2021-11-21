@@ -5,7 +5,7 @@ import { connectToDB, defineDB, initModels } from './src/db/db'
 import { ENVIRONMENT, getEnvVar } from './src/helpers'
 import { defineDbRelations } from './src/db/relations'
 import DataTypes from 'sequelize'
-import { launchMockApp } from './test/unit/__mock__/mockApp'
+import { launchMockApp } from './test/__mock__/mockApp'
 
 export async function launchApp() {
     dotenv.config()

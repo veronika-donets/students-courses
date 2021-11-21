@@ -1,22 +1,22 @@
-import { HomeworkModel } from '../../../src/models'
+import { ResultModel } from '../../src/models'
 import { mockSequelize } from '../__mock__/mockSequelize'
 import dataTypes from 'sequelize'
 import { expect } from '@jest/globals'
 
 describe('Result model testing', () => {
-    const Homework = HomeworkModel(mockSequelize, dataTypes)
-    const homework = new Homework()
+    const Result = ResultModel(mockSequelize, dataTypes)
+    const result = new Result()
 
     test('Check model name', () => {
-        expect(Homework.modelName).toBe('Homeworks')
+        expect(Result.modelName).toBe('Results')
     })
 
     describe('Check model properties', () => {
-        const props = ['id', 'lessonId', 'studentId', 'comment', 'mark']
+        const props = ['id', 'courseId', 'studentId', 'isCoursePassed', 'finalMark', 'feedback']
 
         props.forEach((propName) => {
             test(`Check property '${propName}'`, () => {
-                expect(homework).toHaveProperty(propName)
+                expect(result).toHaveProperty(propName)
             })
         })
     })

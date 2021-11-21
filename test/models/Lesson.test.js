@@ -1,7 +1,7 @@
 import { mockSequelize } from '../__mock__/mockSequelize'
 import dataTypes from 'sequelize'
 import { expect } from '@jest/globals'
-import { LessonModel } from '../../../src/models'
+import { LessonModel } from '../../src/models'
 
 describe('Lesson model testing', () => {
     const Lesson = LessonModel(mockSequelize, dataTypes)

@@ -1,13 +1,13 @@
 import { jest } from '@jest/globals'
-import { Homework, Lesson, Result, File } from '../../../index'
+import { Homework, Lesson, Result, File } from '../../index'
 import { createMockApp } from '../__mock__/mockApp'
-import homeworks from '../../../src/routes/homeworks.routes'
+import homeworks from '../../src/routes/homeworks.routes'
 import { generateMockToken, generateMockTokenRandomId } from '../__mock__/mockAuthToken'
-import { USER_ROLES } from '../../../src/helpers'
+import { USER_ROLES } from '../../src/helpers'
 import faker from 'faker'
 import request from 'supertest'
 import { mockFileBuffer, mockHomework, mockHomeworkId } from '../__mock__/mockResponseData'
-import passport from '../../../src/auth'
+import passport from '../../src/auth'
 
 describe('Homework routes testing', () => {
     let app

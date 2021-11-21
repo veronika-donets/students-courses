@@ -1,22 +1,22 @@
-import { FileModel } from '../../../src/models'
+import { CourseModel } from '../../src/models'
 import { mockSequelize } from '../__mock__/mockSequelize'
 import dataTypes from 'sequelize'
 import { expect } from '@jest/globals'
 
-describe('File model testing', () => {
-    const File = FileModel(mockSequelize, dataTypes)
-    const file = new File()
+describe('Course model testing', () => {
+    const Course = CourseModel(mockSequelize, dataTypes)
+    const course = new Course()
 
     test('Check model name', () => {
-        expect(File.modelName).toBe('Files')
+        expect(Course.modelName).toBe('Courses')
     })
 
     describe('Check model properties', () => {
-        const props = ['id', 'originalname', 'sourceId', 'mimetype', 'size']
+        const props = ['id', 'title', 'description', 'instructorIds']
 
         props.forEach((propName) => {
             test(`Check property '${propName}'`, () => {
-                expect(file).toHaveProperty(propName)
+                expect(course).toHaveProperty(propName)
             })
         })
     })

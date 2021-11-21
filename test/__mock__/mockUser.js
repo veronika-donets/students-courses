@@ -1,4 +1,4 @@
-import { hashPassword, USER_ROLES } from '../../../src/helpers'
+import { hashPassword, USER_ROLES } from '../../src/helpers'
 import { mockAdminId, mockInstructorEmail, mockInstructorId, mockStudentId, mockUser } from './mockResponseData'
 
 export const mockUserModel = (User) => {

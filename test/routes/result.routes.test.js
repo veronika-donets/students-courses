@@ -1,12 +1,12 @@
 import { jest } from '@jest/globals'
-import { Result } from '../../../index'
+import { Result } from '../../index'
 import { createMockApp } from '../__mock__/mockApp'
-import results from '../../../src/routes/results.routes'
+import results from '../../src/routes/results.routes'
 import { generateMockToken } from '../__mock__/mockAuthToken'
-import { USER_ROLES } from '../../../src/helpers'
+import { USER_ROLES } from '../../src/helpers'
 import faker from 'faker'
 import request from 'supertest'
-import passport from '../../../src/auth'
+import passport from '../../src/auth'
 
 describe('Result routes testing', () => {
     let app

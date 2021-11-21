@@ -1,5 +1,5 @@
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
-import { USER_ROLES } from '../../../src/helpers'
+import { USER_ROLES } from '../../src/helpers'
 import passportJs from 'passport'
 
 export function useMockPassport() {

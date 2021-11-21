@@ -1,5 +1,5 @@
 import faker from 'faker'
-import { hashPassword, USER_ROLES, VALIDATIONS } from '../../../src/helpers'
+import { hashPassword, USER_ROLES, VALIDATIONS } from '../../src/helpers'
 
 export const mockUserId = faker.datatype.uuid()
 export const mockStudentId = faker.datatype.uuid()

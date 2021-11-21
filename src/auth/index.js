@@ -1,5 +1,5 @@
 import { ENVIRONMENT } from '../helpers'
-import { useMockPassport } from '../../test/unit/__mock__/mockPassport'
+import { useMockPassport } from '../../test/__mock__/mockPassport'
 import { useAppPassport } from './passport'
 
 const passport =
