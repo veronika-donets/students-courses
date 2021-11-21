@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-import { File } from '../../../index'
+import { File } from '../../index'
 import faker from 'faker'
 import { getMockFileList } from '../__mock__/mockFile'
 import {
@@ -8,8 +8,8 @@ import {
     getFileByIdWithSource,
     removeFiles,
     removeFilesWithS3,
-} from '../../../src/services/file.service'
-import { s3bucket } from '../../../src/services/aws-S3.service'
+} from '../../src/services/file.service'
+import { s3bucket } from '../../src/services/aws-S3.service'
 import { mockFile, randomMimetype } from '../__mock__/mockResponseData'
 
 describe('File service testing', () => {
@@ -40,7 +40,7 @@ describe('File service testing', () => {
 
     test('create Uploaded Files With S3', async () => {
         const testFile = {
-            path: 'test/unit/__mock__/mockUploadedFile',
+            path: 'test/__mock__/mockUploadedFile',
             originalname: faker.datatype.string(),
             mimetype: randomMimetype,
             size: faker.datatype.number({ min: 0, max: 50000 }),
@@ -82,7 +82,7 @@ describe('File service testing', () => {
     test('remove Files With S3', async () => {
         const count = 7
         const testFile = {
-            path: 'test/unit/__mock__/mockUploadedFile',
+            path: 'test/__mock__/mockUploadedFile',
             originalname: faker.datatype.string(),
             mimetype: randomMimetype,
             size: faker.datatype.number({ min: 0, max: 50000 }),

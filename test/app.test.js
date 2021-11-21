@@ -1,4 +1,4 @@
-import { createExpressApp } from '../../src/app'
+import { createExpressApp } from '../src/app'
 import mock from './__mock__/mock.routes'
 import request from 'supertest'
 

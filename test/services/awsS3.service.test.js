@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-import { downloadFromS3, removeFromS3, uploadToS3 } from '../../../src/services/aws-S3.service'
+import { downloadFromS3, removeFromS3, uploadToS3 } from '../../src/services/aws-S3.service'
 import faker from 'faker'
 import { randomMimetype } from '../__mock__/mockResponseData'
 
@@ -10,7 +10,7 @@ describe('AWS S3 service testing', () => {
 
     test('upload To S3', async () => {
         const testFile = {
-            path: 'test/unit/__mock__/mockUploadedFile',
+            path: 'test/__mock__/mockUploadedFile',
             originalname: faker.datatype.string(),
             mimetype: randomMimetype,
             size: faker.datatype.number({ min: 0, max: 50000 }),
@@ -23,7 +23,7 @@ describe('AWS S3 service testing', () => {
 
     test('upload To S3 failed', async () => {
         const testFile = {
-            path: 'test/unit/__mock__/mockUploadedFile',
+            path: 'test/__mock__/mockUploadedFile',
             originalname: faker.datatype.string(),
             mimetype: randomMimetype,
             size: faker.datatype.number({ min: 0, max: 50000 }),

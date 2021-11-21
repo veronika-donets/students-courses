@@ -10,10 +10,10 @@ import {
     updatePassword,
     updateIsEmailVerified,
     updateUserRole,
-} from '../../../src/services/user.service'
-import { User } from '../../../index'
+} from '../../src/services/user.service'
+import { User } from '../../index'
 import faker from 'faker'
-import { USER_ROLES } from '../../../src/helpers'
+import { USER_ROLES } from '../../src/helpers'
 import { mockUser } from '../__mock__/mockResponseData'
 
 describe('User service testing', () => {

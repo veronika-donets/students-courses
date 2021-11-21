@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-import { File, Lesson } from '../../../index'
+import { File, Lesson } from '../../index'
 import faker from 'faker'
 import { getMockLessonListWithFiles } from '../__mock__/mockLesson'
 import {
@@ -10,7 +10,7 @@ import {
     getLessonWithHomeworkById,
     removeLessonsWithRelations,
     updateLesson,
-} from '../../../src/services/lesson.service'
+} from '../../src/services/lesson.service'
 import { mockFile, mockLesson } from '../__mock__/mockResponseData'
 
 describe('Lesson service testing', () => {

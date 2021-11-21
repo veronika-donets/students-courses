@@ -1,5 +1,5 @@
 import dataTypes from 'sequelize'
-import { UserModel } from '../../../src/models'
+import { UserModel } from '../../src/models'
 import { expect } from '@jest/globals'
 import { mockSequelize } from '../__mock__/mockSequelize'
 

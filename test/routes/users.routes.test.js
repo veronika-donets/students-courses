@@ -1,14 +1,14 @@
 import request from 'supertest'
 import { jest } from '@jest/globals'
 import { createMockApp, mockSendGrid } from '../__mock__/mockApp'
-import users from '../../../src/routes/users.routes'
+import users from '../../src/routes/users.routes'
 import faker from 'faker'
-import { User } from '../../../index'
-import { generateAuthToken } from '../../../src/services/user.service'
-import { USER_ROLES } from '../../../src/helpers'
+import { User } from '../../index'
+import { generateAuthToken } from '../../src/services/user.service'
+import { USER_ROLES } from '../../src/helpers'
 import { generateMockToken } from '../__mock__/mockAuthToken'
 import { mockInstructorEmail, mockInstructorId, mockUser } from '../__mock__/mockResponseData'
-import passport from '../../../src/auth'
+import passport from '../../src/auth'
 
 describe('User routes testing', () => {
     let app

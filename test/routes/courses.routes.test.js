@@ -1,9 +1,9 @@
 import { jest } from '@jest/globals'
-import { Course, Result, User } from '../../../index'
+import { Course, Result, User } from '../../index'
 import { createMockApp } from '../__mock__/mockApp'
-import courses from '../../../src/routes/courses.routes'
+import courses from '../../src/routes/courses.routes'
 import { generateMockToken, generateMockTokenRandomId } from '../__mock__/mockAuthToken'
-import { USER_ROLES } from '../../../src/helpers'
+import { USER_ROLES } from '../../src/helpers'
 import request from 'supertest'
 import faker from 'faker'
 import {
@@ -11,7 +11,7 @@ import {
     mockInstructorId,
     mockStudentId,
 } from '../__mock__/mockResponseData'
-import passport from '../../../src/auth'
+import passport from '../../src/auth'
 
 describe('Course routes testing', () => {
     let app

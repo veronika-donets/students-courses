@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals'
-import { Course, Result } from '../../../index'
+import { Course, Result } from '../../index'
 import faker from 'faker'
 import {
     assignInstructorToCourse,
@@ -13,7 +13,7 @@ import {
     unassignInstructorFromAllCourses,
     unassignInstructorFromCourse,
     updateCourse,
-} from '../../../src/services/course.service'
+} from '../../src/services/course.service'
 import { getMockCourseWithLesson } from '../__mock__/mockCourse'
 import Lodash from 'lodash'
 import { mockCourse, mockLesson } from '../__mock__/mockResponseData'
