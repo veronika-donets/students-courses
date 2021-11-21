@@ -11,6 +11,7 @@ import {
     mockInstructorId,
     mockStudentId,
 } from '../__mock__/mockResponseData'
+import passport from '../../../src/auth'
 
 describe('Course routes testing', () => {
     let app
@@ -30,6 +31,7 @@ describe('Course routes testing', () => {
 
     beforeAll(async () => {
         app = createMockApp()
+        app.use(passport.initialize())
         app.use('/courses', courses)
 
         adminToken = await generateMockToken({ role: USER_ROLES.ADMIN })

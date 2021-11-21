@@ -1,4 +1,4 @@
-import passport from '../config/passport'
+import passport from '../auth'
 import { USER_ROLES } from '../helpers'
 import { Router } from 'express'
 import { downloadFromS3 } from '../services/aws-S3.service'
@@ -16,9 +16,13 @@ router.get(
 
             const result = await getFileByIdWithSource(id)
 
-            const { originalname, sourceId, Homeworks, Lessons } = result
+            if (!result) {
+                return res.status(404).json({ message: 'File not found' })
+            }
 
-            if (!Homeworks && Lodash.isEmpty(Lessons.Course.Results)) {
+            const { originalname, sourceId, Homework, Lesson } = result
+
+            if (!Homework && Lodash.isEmpty(Lesson.Course.Results)) {
                 return res.status(403).json({ message: 'You are not authorized to see this file' })
             }
 

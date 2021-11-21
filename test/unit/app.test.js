@@ -11,5 +11,4 @@ describe('App testing', () => {
 
         expect(response.text).toBe('OK')
     })
-
 })

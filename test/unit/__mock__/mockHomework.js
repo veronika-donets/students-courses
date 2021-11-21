@@ -54,8 +54,6 @@ export const mockHomeworkModel = (Homework, File, Lesson) => {
         return new Promise((resolve) => resolve({ ...mockHomework, ...where }))
     }
     Homework.findAll = ({ where }) => {
-        if (where.isArray) {
-        }
         return new Promise((resolve) => resolve(getMockHomeworkList(mockHomework, where)))
     }
     Homework.create = (params) => {
@@ -68,8 +66,8 @@ export const mockHomeworkModel = (Homework, File, Lesson) => {
             })
         )
     }
-    Homework.update = (params) => {
-        return new Promise((resolve) => resolve({ ...mockHomework, ...params }))
+    Homework.update = () => {
+        return new Promise((resolve) => resolve([1]))
     }
     Homework.destroy = () => {
         return new Promise((resolve) => resolve([1]))

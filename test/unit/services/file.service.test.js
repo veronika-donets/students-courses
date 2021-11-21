@@ -58,7 +58,7 @@ describe('File service testing', () => {
     test('get File By Id With Source', async () => {
         const id = faker.datatype.uuid()
         const file = await getFileByIdWithSource(id)
-        const courses = file.Lessons.every((el) => el.hasOwnProperty('Courses'))
+        const courses = file.Lesson.every((el) => el.hasOwnProperty('Courses'))
 
         expect(spyFileFindOne).toHaveBeenCalledTimes(1)
         expect(file.id).toBe(id)
@@ -66,8 +66,8 @@ describe('File service testing', () => {
         expect(file.sourceId).toBe(mockFile.sourceId)
         expect(file.mimetype).toBe(mockFile.mimetype)
         expect(file.size).toBe(mockFile.size)
-        expect(file.Homeworks).toBeDefined()
-        expect(file.Lessons).toBeDefined()
+        expect(file.Homework).toBeDefined()
+        expect(file.Lesson).toBeDefined()
         expect(courses).toBeDefined()
     })
 

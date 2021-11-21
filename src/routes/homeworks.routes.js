@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import passport from '../config/passport'
+import passport from '../auth'
 import { checkUnsupportedFormat, USER_ROLES } from '../helpers'
 import multer from 'multer'
 import {

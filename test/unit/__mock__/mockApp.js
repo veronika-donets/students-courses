@@ -1,7 +1,6 @@
 import dataTypes from 'sequelize'
 import express from 'express'
 import bodyParser from 'body-parser'
-import passport from 'passport'
 import { initModels } from '../../../src/db/db'
 import { mockSequelize } from './mockSequelize'
 import { mockUserModel } from './mockUser'
@@ -11,8 +10,9 @@ import { mockCourseModel } from './mockCourse'
 import { mockHomeworkModel } from './mockHomework'
 import { mockLessonModel } from './mockLesson'
 import { mockFileModel } from './mockFile'
+import { defineDbRelations } from '../../../src/db/relations'
 
-export function launchMockApp() {
+export async function launchMockApp() {
     const { Course, Homework, Lesson, User, File, Result } = initModels(mockSequelize, dataTypes)
 
     mockUserModel(User)
@@ -24,6 +24,8 @@ export function launchMockApp() {
 
     const Models = { Course, Homework, Lesson, User, File, Result }
 
+    await defineDbRelations(mockSequelize, Models)
+
     return { sequelize: mockSequelize, dataTypes, Models }
 }
 
@@ -32,7 +34,6 @@ export const createMockApp = () => {
 
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: true }))
-    app.use(passport.initialize())
 
     return app
 }

@@ -48,12 +48,10 @@ describe('Course service testing', () => {
         const title = faker.lorem.sentences(1)
         const description = faker.lorem.sentences(3)
 
-        const course = await updateCourse(id, title, description)
+        const result = await updateCourse(id, title, description)
 
         expect(spyCourseUpdate).toHaveBeenCalledTimes(1)
-        expect(course.id).toBe(id)
-        expect(course.title).toBe(title)
-        expect(course.description).toBe(description)
+        expect(result).toStrictEqual([1])
     })
 
     test('assign Instructor To Course', async () => {

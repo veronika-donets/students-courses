@@ -1,13 +1,14 @@
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
 import { USER_ROLES } from '../../../src/helpers'
+import passportJs from 'passport'
 
-export default function useMockPassport(passport) {
+export function useMockPassport() {
     const options = {
         jwtFromRequest: ExtractJwt.fromHeader('jwt'),
         secretOrKey: process.env.AUTH_SECRET_KEY,
     }
 
-    passport.use(
+    passportJs.use(
         USER_ROLES.ADMIN,
         new JwtStrategy(options, (jwt_payload, done) => {
             try {
@@ -24,7 +25,7 @@ export default function useMockPassport(passport) {
         })
     )
 
-    passport.use(
+    passportJs.use(
         USER_ROLES.INSTRUCTOR,
         new JwtStrategy(options, (jwt_payload, done) => {
             try {
@@ -41,7 +42,7 @@ export default function useMockPassport(passport) {
         })
     )
 
-    passport.use(
+    passportJs.use(
         USER_ROLES.STUDENT,
         new JwtStrategy(options, (jwt_payload, done) => {
             try {
@@ -58,13 +59,13 @@ export default function useMockPassport(passport) {
         })
     )
 
-    passport.serializeUser(function (user, done) {
+    passportJs.serializeUser(function (user, done) {
         done(null, user)
     })
 
-    passport.deserializeUser(function (user, done) {
+    passportJs.deserializeUser(function (user, done) {
         done(null, user)
     })
 
-    return passport
+    return passportJs
 }

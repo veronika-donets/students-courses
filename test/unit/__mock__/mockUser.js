@@ -1,5 +1,5 @@
 import { hashPassword, USER_ROLES } from '../../../src/helpers'
-import { mockAdminId, mockInstructorId, mockStudentId, mockUser } from './mockResponseData'
+import { mockAdminId, mockInstructorEmail, mockInstructorId, mockStudentId, mockUser } from './mockResponseData'
 
 export const mockUserModel = (User) => {
     User.findOne = ({ where }) => {
@@ -16,6 +16,11 @@ export const mockUserModel = (User) => {
         if (where.id && where.id === mockAdminId) {
             return new Promise((resolve) =>
                 resolve({ ...mockUser, role: USER_ROLES.ADMIN, ...where })
+            )
+        }
+        if (where.email && where.email === mockInstructorEmail.toLowerCase()) {
+            return new Promise((resolve) =>
+                resolve({ ...mockUser, role: USER_ROLES.INSTRUCTOR, ...where })
             )
         }
         return new Promise((resolve) => resolve({ ...mockUser, ...where }))
@@ -36,7 +41,7 @@ export const mockUserModel = (User) => {
                 })
             )
         }
-        return new Promise((resolve) => resolve({ ...mockUser, ...params }))
+        return new Promise((resolve) => resolve([1]))
     }
     User.destroy = () => {}
 }

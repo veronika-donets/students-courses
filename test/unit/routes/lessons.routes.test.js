@@ -7,6 +7,7 @@ import { USER_ROLES } from '../../../src/helpers'
 import faker from 'faker'
 import request from 'supertest'
 import { mockCourse, mockFileBuffer, mockLesson, mockLessonId } from '../__mock__/mockResponseData'
+import passport from '../../../src/auth'
 
 describe('Lesson routes testing', () => {
     let app
@@ -25,6 +26,7 @@ describe('Lesson routes testing', () => {
 
     beforeAll(async () => {
         app = createMockApp()
+        app.use(passport.initialize())
         app.use('/lessons', lessons)
 
         adminToken = await generateMockToken({ role: USER_ROLES.ADMIN })

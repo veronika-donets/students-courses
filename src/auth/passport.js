@@ -1,16 +1,15 @@
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
-import { ENVIRONMENT, USER_ROLES } from '../helpers'
+import { USER_ROLES } from '../helpers'
 import { getUserById } from '../services/user.service'
-import useMockPassport from '../../test/unit/__mock__/mockPassport'
-import passportjs from 'passport'
+import passportJs from 'passport'
 
-export function useAppPassport(passport) {
+export function useAppPassport() {
     const options = {
         jwtFromRequest: ExtractJwt.fromHeader('jwt'),
         secretOrKey: process.env.AUTH_SECRET_KEY,
     }
 
-    passport.use(
+    passportJs.use(
         USER_ROLES.ADMIN,
         new JwtStrategy(options, async (jwt_payload, done) => {
             try {
@@ -28,7 +27,7 @@ export function useAppPassport(passport) {
         })
     )
 
-    passport.use(
+    passportJs.use(
         USER_ROLES.INSTRUCTOR,
         new JwtStrategy(options, async (jwt_payload, done) => {
             try {
@@ -46,7 +45,7 @@ export function useAppPassport(passport) {
         })
     )
 
-    passport.use(
+    passportJs.use(
         USER_ROLES.STUDENT,
         new JwtStrategy(options, async (jwt_payload, done) => {
             try {
@@ -64,7 +63,7 @@ export function useAppPassport(passport) {
         })
     )
 
-    passport.serializeUser(function (user, done) {
+    passportJs.serializeUser(function (user, done) {
         const sessionUser = {
             id: user.id,
             email: user.email,
@@ -73,16 +72,9 @@ export function useAppPassport(passport) {
         done(null, sessionUser)
     })
 
-    passport.deserializeUser(function (user, done) {
+    passportJs.deserializeUser(function (user, done) {
         done(null, user)
     })
 
-    return passport
+    return passportJs
 }
-
-const passport =
-    process.env.NODE_ENV === ENVIRONMENT.TEST
-        ? useMockPassport(passportjs)
-        : useAppPassport(passportjs)
-
-export default passport

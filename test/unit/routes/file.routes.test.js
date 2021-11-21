@@ -6,6 +6,7 @@ import { USER_ROLES } from '../../../src/helpers'
 import faker from 'faker'
 import request from 'supertest'
 import files from '../../../src/routes/files.routes'
+import passport from '../../../src/auth'
 
 describe('File routes testing', () => {
     let app
@@ -15,6 +16,7 @@ describe('File routes testing', () => {
 
     beforeAll(async () => {
         app = createMockApp()
+        app.use(passport.initialize())
         app.use('/files', files)
 
         studentToken = await generateMockToken({ role: USER_ROLES.STUDENT })

@@ -7,7 +7,8 @@ import { User } from '../../../index'
 import { generateAuthToken } from '../../../src/services/user.service'
 import { USER_ROLES } from '../../../src/helpers'
 import { generateMockToken } from '../__mock__/mockAuthToken'
-import { mockUser } from '../__mock__/mockResponseData'
+import { mockInstructorEmail, mockInstructorId, mockUser } from '../__mock__/mockResponseData'
+import passport from '../../../src/auth'
 
 describe('User routes testing', () => {
     let app
@@ -22,10 +23,11 @@ describe('User routes testing', () => {
 
     beforeAll(async () => {
         app = createMockApp()
+        app.use(passport.initialize())
         app.use('/users', users)
 
         adminToken = await generateMockToken({ role: USER_ROLES.ADMIN })
-        instructorToken = await generateMockToken({ role: USER_ROLES.INSTRUCTOR })
+        instructorToken = await generateMockToken({ role: USER_ROLES.INSTRUCTOR }, mockInstructorId)
         studentToken = await generateMockToken({ role: USER_ROLES.STUDENT })
     })
 
@@ -226,7 +228,7 @@ describe('User routes testing', () => {
 
     test('Delete user success', async () => {
         const params = {
-            email: faker.internet.email(),
+            email: mockInstructorEmail,
         }
         const response = await request(app).delete('/users/').query(params).set({ jwt: adminToken })
         const { message } = response.body

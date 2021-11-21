@@ -2,13 +2,13 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import helmet from 'helmet'
 import cors from 'cors'
-import passport from 'passport'
 import users from './routes/users.routes'
 import courses from './routes/courses.routes'
 import lessons from './routes/lessons.routes'
 import files from './routes/files.routes'
 import homeworks from './routes/homeworks.routes'
 import results from './routes/results.routes'
+import passport from './auth'
 
 export function createExpressApp() {
     const app = express()

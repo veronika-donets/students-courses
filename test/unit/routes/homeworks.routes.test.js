@@ -7,6 +7,7 @@ import { USER_ROLES } from '../../../src/helpers'
 import faker from 'faker'
 import request from 'supertest'
 import { mockFileBuffer, mockHomework, mockHomeworkId } from '../__mock__/mockResponseData'
+import passport from '../../../src/auth'
 
 describe('Homework routes testing', () => {
     let app
@@ -24,6 +25,7 @@ describe('Homework routes testing', () => {
 
     beforeAll(async () => {
         app = createMockApp()
+        app.use(passport.initialize())
         app.use('/homeworks', homeworks)
 
         adminToken = await generateMockToken({ role: USER_ROLES.ADMIN })
@@ -134,7 +136,7 @@ describe('Homework routes testing', () => {
     test('Put homework mark success', async () => {
         const body = {
             homeworkId: faker.datatype.uuid(),
-            mark: faker.datatype.number({ max: 100, min: 0 }),
+            mark: faker.datatype.number({ max: 100, min: 1 }),
         }
 
         const response = await request(app)
