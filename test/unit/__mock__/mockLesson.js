@@ -56,8 +56,8 @@ export const mockLessonModel = (Lesson, Homework, File, Course) => {
             })
         )
     }
-    Lesson.update = (params) => {
-        return new Promise((resolve) => resolve({ ...mockLesson, ...params }))
+    Lesson.update = () => {
+        return new Promise((resolve) => resolve([1]))
     }
     Lesson.destroy = () => {
         return new Promise((resolve) => resolve([1]))

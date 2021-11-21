@@ -1,29 +1,25 @@
 export const initMockBucket = () => {
-    //TODO
     return {
-        upload: (params, callback) => {
-            callback(null, 'success')
-            // if (isAWScallSuccess) {
-            //     callback(null, 'success')
-            // } else {
-            //     callback({ message: 'failed' }, null)
-            // }
+        upload: (params, done) => {
+            if (!params.Key.startsWith('/')) {
+                done(null, 'success')
+            } else {
+                done({ message: 'failed' }, null)
+            }
         },
-        getObject: (params, callback) => {
-            callback(null, 'success')
-            // if (isAWScallSuccess) {
-            //     callback(null, 'success')
-            // } else {
-            //     callback({ message: 'failed' }, null)
-            // }
+        getObject: (params, done) => {
+            if (!params.Key.startsWith('/')) {
+                done(null, 'success')
+            } else {
+                done({ message: 'failed' }, null)
+            }
         },
-        deleteObject: (params, callback) => {
-            callback(null, 'success')
-            // if (isAWScallSuccess) {
-            //     callback(null, 'success')
-            // } else {
-            //     callback({ message: 'failed' }, null)
-            // }
+        deleteObject: (params, done) => {
+            if (!params.Key.startsWith('/')) {
+                done(null, 'success')
+            } else {
+                done({ message: 'failed' }, null)
+            }
         },
     }
 }

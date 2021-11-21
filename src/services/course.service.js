@@ -102,24 +102,18 @@ export const unassignInstructorFromAllCourses = (courseIds, instructorId) => {
 }
 
 export const findAvailableCourses = async (limit, offset, isActive = true) => {
-    const filter = isActive
-        ? {
-              include: [
-                  {
-                      model: Lesson,
-                      attributes: ['id', 'title'],
-                      required: false,
-                  },
-              ],
-          }
-        : {}
-
     const courses = await Course.findAll({
         limit: limit || 50,
         offset: offset,
         row: true,
         attributes: ['id', 'title', 'description', 'instructorIds'],
-        ...filter,
+        include: [
+            {
+                model: Lesson,
+                attributes: ['id', 'title'],
+                required: false,
+            },
+        ],
     })
 
     if (!isActive) {

@@ -23,8 +23,8 @@ export const mockResultModel = (Result) => {
             })
         )
     }
-    Result.update = (params) => {
-        return new Promise((resolve) => resolve({ ...mockResult, ...params }))
+    Result.update = () => {
+        return new Promise((resolve) => resolve([1]))
     }
     Result.destroy = () => {
         return new Promise((resolve) => resolve([1]))

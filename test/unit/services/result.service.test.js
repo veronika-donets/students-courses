@@ -67,11 +67,7 @@ describe('Result service testing', () => {
         const result = await updateFeedback(id, randomFeedback)
 
         expect(spyResultUpdate).toHaveBeenCalledTimes(1)
-        expect(result.id).toBe(id)
-        expect(result.courseId).toBe(mockResult.courseId)
-        expect(result.studentId).toBe(mockResult.studentId)
-        expect(result.isCoursePassed).toBe(mockResult.isCoursePassed)
-        expect(result.finalMark).toBe(mockResult.finalMark)
+        expect(result).toStrictEqual([1])
     })
 
     test('update Final Mark', async () => {
@@ -82,11 +78,7 @@ describe('Result service testing', () => {
         const result = await updateFinalMark(id, finalMark, isCoursePassed)
 
         expect(spyResultUpdate).toHaveBeenCalledTimes(1)
-        expect(result.id).toBe(id)
-        expect(result.courseId).toBe(mockResult.courseId)
-        expect(result.studentId).toBe(mockResult.studentId)
-        expect(result.isCoursePassed).toBe(isCoursePassed)
-        expect(result.finalMark).toBe(finalMark)
+        expect(result).toStrictEqual([1])
     })
 
     test('get Students Per Course', async () => {

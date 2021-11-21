@@ -126,31 +126,19 @@ describe('User service testing', () => {
     test('update Is Email Verified', async () => {
         const id = faker.datatype.uuid()
         const isEmailVerified = faker.datatype.boolean()
-        const user = await updateIsEmailVerified(id, isEmailVerified)
+        const result = await updateIsEmailVerified(id, isEmailVerified)
 
         expect(spyUserUpdate).toHaveBeenCalledTimes(1)
-        expect(user.id).toBe(mockUser.id)
-        expect(user.email).toBe(mockUser.email)
-        expect(user.firstName).toBe(mockUser.firstName)
-        expect(user.lastName).toBe(mockUser.lastName)
-        expect(user.agreeTOS).toBe(mockUser.agreeTOS)
-        expect(user.isEmailVerified).toBe(isEmailVerified)
-        expect(user.role).toBe(mockUser.role)
+        expect(result).toStrictEqual([1])
     })
 
     test('update User Role', async () => {
         const id = mockUser.id
         const role = faker.random.arrayElement(Object.values(USER_ROLES)).toLowerCase()
-        const user = await updateUserRole(id, role)
+        const result = await updateUserRole(id, role)
 
         expect(spyUserUpdate).toHaveBeenCalledTimes(1)
-        expect(user.id).toBe(id)
-        expect(user.email).toBe(mockUser.email)
-        expect(user.firstName).toBe(mockUser.firstName)
-        expect(user.lastName).toBe(mockUser.lastName)
-        expect(user.agreeTOS).toBe(mockUser.agreeTOS)
-        expect(user.isEmailVerified).toBe(mockUser.isEmailVerified)
-        expect(user.role).toBe(role.toUpperCase())
+        expect(result).toStrictEqual([1])
     })
 
     test("update User Role returns null if a role doesn't exist", async () => {

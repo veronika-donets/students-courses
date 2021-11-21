@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import passport from '../config/passport'
+import passport from '../auth'
 import { USER_ROLES } from '../helpers'
 import {
     getResultByCredentials,

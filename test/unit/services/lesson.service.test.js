@@ -41,12 +41,10 @@ describe('Lesson service testing', () => {
         const title = faker.lorem.sentences(1)
         const description = faker.lorem.sentences(3)
 
-        const lesson = await updateLesson(id, title, description)
+        const result = await updateLesson(id, title, description)
 
         expect(spyLessonUpdate).toHaveBeenCalledTimes(1)
-        expect(lesson.id).toBe(id)
-        expect(lesson.title).toBe(title)
-        expect(lesson.description).toBe(description)
+        expect(result).toStrictEqual([1])
     })
 
     test('get Lesson With Files', async () => {

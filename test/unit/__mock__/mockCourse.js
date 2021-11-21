@@ -56,7 +56,7 @@ export const mockCourseModel = (Course, Lesson) => {
                 resolve({ ...mockCourse, ...params, instructorIds: [] })
             )
         }
-        return new Promise((resolve) => resolve({ ...mockCourse, ...params }))
+        return new Promise((resolve) => resolve([1]))
     }
     Course.destroy = () => {
         return new Promise((resolve) => resolve([1]))

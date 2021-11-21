@@ -20,6 +20,7 @@ export async function launchApp() {
         const Db = defineDB()
         const sequelize = await connectToDB(Db)
         const Models = initModels(sequelize, DataTypes)
+        await defineDbRelations(sequelize, Models)
 
         server.listen(port, host, () => {
             console.log(`App started on port: ${port}, host: ${host}`)
@@ -33,7 +34,5 @@ export async function launchApp() {
 
 export const { sequelize, dataTypes, Models } =
     process.env.NODE_ENV === ENVIRONMENT.TEST ? await launchMockApp() : await launchApp()
-
-await defineDbRelations(sequelize, Models)
 
 export const { Course, Homework, Lesson, User, File, Result } = Models

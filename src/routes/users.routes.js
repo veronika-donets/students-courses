@@ -14,7 +14,7 @@ import {
 } from '../services/user.service'
 import { sendResetPassEmail, sendVerificationEmail } from '../services/email.service'
 import jwt_decode from 'jwt-decode'
-import passport from '../config/passport'
+import passport from '../auth'
 import { USER_ROLES } from '../helpers'
 import {
     findCoursesByInstructorId,
@@ -316,7 +316,7 @@ router.get('/', passport.authenticate([USER_ROLES.ADMIN]), async (req, res) => {
             },
         })
     } catch {
-        res.status(400).json({ message: 'Cannot get user' })
+        res.status(500).json({ message: 'Cannot get user' })
     }
 })
 

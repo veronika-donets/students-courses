@@ -15,7 +15,7 @@ export const mockFileModel = (File, Homework, Lesson) => {
                         ...mockHomework,
                         sourceId: where.id,
                     }))
-                    return { Homeworks: homeworks }
+                    return { Homework: homeworks }
                 }
                 if (el.model === Lesson) {
                     const lessons = Array.from({ length: 3 }, () => ({
@@ -26,7 +26,7 @@ export const mockFileModel = (File, Homework, Lesson) => {
                         const course = { ...mockCourse, Results: mockResult }
                         return { ...el, Courses: course }
                     })
-                    return { Lessons: lessonsWithRelations }
+                    return { Lesson: lessonsWithRelations }
                 }
             })
             const attachedModels = models.reduce((res, el) => ({ ...res, ...el }), {})

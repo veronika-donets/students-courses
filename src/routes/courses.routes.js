@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import passport from '../config/passport'
+import passport from '../auth'
 import { USER_ROLES } from '../helpers'
 import {
     assignInstructorToCourse,
@@ -38,7 +38,11 @@ router.put('/update', passport.authenticate([USER_ROLES.ADMIN]), async (req, res
             return res.status(404).json({ message: 'Course Id is not provided' })
         }
 
-        await updateCourse(courseId, title, description)
+        const result = await updateCourse(courseId, title, description)
+
+        if (!result[0]) {
+            return res.status(400).json({ message: 'Cannot update course' })
+        }
 
         res.json({ message: 'Course successfully updated' })
     } catch (e) {

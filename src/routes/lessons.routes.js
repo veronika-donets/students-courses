@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import passport from '../config/passport'
+import passport from '../auth'
 import { checkUnsupportedFormat, USER_ROLES } from '../helpers'
 import {
     createLesson,
@@ -106,6 +106,10 @@ router.get(
 
             if (user.role === USER_ROLES.STUDENT) {
                 const lesson = await findCourseFromLessonId(id)
+
+                if (!lesson) {
+                    return res.status(404).json({ message: 'Lesson not found' })
+                }
 
                 const { id: courseId } = lesson.Course
 

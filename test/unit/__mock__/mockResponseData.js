@@ -12,6 +12,7 @@ export const mockHomeworkId = faker.datatype.uuid()
 export const mockResultId = faker.datatype.uuid()
 export const mockFileId = faker.datatype.uuid()
 export const mockFileBuffer = Buffer.from('a'.repeat(10000))
+export const mockInstructorEmail = faker.internet.email()
 
 export const randomLength = faker.datatype.number({ min: 1, max: 10 })
 export const randomMark = faker.datatype.number({ min: 1, max: 100 })

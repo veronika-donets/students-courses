@@ -40,30 +40,20 @@ describe('Homework service testing', () => {
 
     test('Update Homework', async () => {
         const id = mockHomework.id
-        const comment = randomComment
 
-        const homework = await updateHomework(id, comment)
+        const result = await updateHomework(id, randomComment)
 
         expect(spyHomeworkUpdate).toHaveBeenCalledTimes(1)
-        expect(homework.id).toBe(mockHomework.id)
-        expect(homework.lessonId).toBe(mockHomework.lessonId)
-        expect(homework.studentId).toBe(mockHomework.studentId)
-        expect(homework.comment).toBe(comment)
-        expect(homework.mark).toBe(mockHomework.mark)
+        expect(result).toStrictEqual([1])
     })
 
     test('Put mark', async () => {
         const id = mockHomework.id
-        const mark = randomMark
 
-        const homework = await putMark(id, mark)
+        const result = await putMark(id, randomMark)
 
         expect(spyHomeworkUpdate).toHaveBeenCalledTimes(1)
-        expect(homework.id).toBe(mockHomework.id)
-        expect(homework.lessonId).toBe(mockHomework.lessonId)
-        expect(homework.studentId).toBe(mockHomework.studentId)
-        expect(homework.comment).toBe(mockHomework.comment)
-        expect(homework.mark).toBe(mark)
+        expect(result).toStrictEqual([1])
     })
 
     test('get All Homeworks Per Course', async () => {

@@ -14,14 +14,14 @@ export const getLessonWithFiles = (id) => {
                 include: [
                     {
                         model: File,
-                        attributes: ['id'],
+                        attributes: ['id', 'sourceId', 'originalname'],
                         required: false,
                     },
                 ],
             },
             {
                 model: File,
-                attributes: ['id'],
+                attributes: ['id', 'sourceId', 'originalname'],
                 required: false,
             },
         ],

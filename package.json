@@ -2,6 +2,9 @@
   "name": "students-courses",
   "version": "1.0.0",
   "description": "An app for students to take and pass courses",
+  "engines": {
+    "node": "16.x.x"
+  },
   "type": "module",
   "main": "index.js",
   "scripts": {
