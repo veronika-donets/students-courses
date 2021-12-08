@@ -1,13 +1,14 @@
 pipeline {
     agent {
         docker {
-            image 'node:16-alpine'
+            image 'docker'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
     stages {
         stage('Build') {
             steps {
-                sh 'npm run docker:build'
+                sh 'NODE_ENV=PROD docker compose build'
             }
         }
         stage('Test') {
@@ -17,7 +18,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                echo 'npm run docker:run'
+                echo 'NODE_ENV=PROD docker compose up'
             }
         }
     }
