@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'NODE_ENV=PROD docker compose build'
+                sh 'NODE_ENV=PROD docker-compose build'
             }
         }
         stage('Test') {
@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                echo 'NODE_ENV=PROD docker compose up'
+                echo 'NODE_ENV=PROD docker-compose up'
             }
         }
     }
