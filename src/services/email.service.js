@@ -51,3 +51,4 @@ export const sendVerificationEmail = async (emailAddress, token) => {
         throw new Error(e)
     }
 }
+
