@@ -47,6 +47,7 @@ src/logs/api.log
 uploads/*
 
 /.env
+/.env.*
 
 # Sertificates
 *.pem

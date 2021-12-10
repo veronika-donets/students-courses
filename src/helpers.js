@@ -3,10 +3,6 @@ import bcrypt from 'bcryptjs'
 import Lodash from 'lodash'
 dotenv.config()
 
-export function getEnvVar(variable) {
-    return process.env[`${variable}_${process.env.NODE_ENV}`] || ''
-}
-
 export const USER_ROLES = Object.freeze({
     ADMIN: 'ADMIN',
     INSTRUCTOR: 'INSTRUCTOR',
@@ -14,9 +10,9 @@ export const USER_ROLES = Object.freeze({
 })
 
 export const ENVIRONMENT = Object.freeze({
-    DEV: 'DEV',
-    TEST: 'TEST',
-    PROD: 'PROD',
+    DEV: 'development',
+    TEST: 'test',
+    PROD: 'production',
 })
 
 export const VALIDATIONS = Object.freeze({

@@ -13,7 +13,7 @@ describe('Passport testing', () => {
 
         expect(passport).toBeDefined()
 
-        Object.values(USER_ROLES).forEach(prop => {
+        Object.values(USER_ROLES).forEach((prop) => {
             expect(passport._strategies).toHaveProperty(prop)
         })
     })
@@ -65,7 +65,10 @@ describe('Passport testing', () => {
 
         app.use('/test', router)
 
-        const instructorToken = await generateMockToken({ role: USER_ROLES.INSTRUCTOR }, mockInstructorId)
+        const instructorToken = await generateMockToken(
+            { role: USER_ROLES.INSTRUCTOR },
+            mockInstructorId
+        )
 
         const response = await request(app).get('/test').set({ jwt: instructorToken })
 
@@ -119,7 +122,10 @@ describe('Passport testing', () => {
 
         app.use('/test', router)
 
-        const instructorToken = await generateMockToken({ role: USER_ROLES.INSTRUCTOR }, mockInstructorId)
+        const instructorToken = await generateMockToken(
+            { role: USER_ROLES.INSTRUCTOR },
+            mockInstructorId
+        )
 
         const response = await request(app).get('/test').set({ jwt: instructorToken })
 

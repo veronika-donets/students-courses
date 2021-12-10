@@ -1,5 +1,11 @@
 import { hashPassword, USER_ROLES } from '../../src/helpers'
-import { mockAdminId, mockInstructorEmail, mockInstructorId, mockStudentId, mockUser } from './mockResponseData'
+import {
+    mockAdminId,
+    mockInstructorEmail,
+    mockInstructorId,
+    mockStudentId,
+    mockUser,
+} from './mockResponseData'
 
 export const mockUserModel = (User) => {
     User.findOne = ({ where }) => {
