@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                echo 'NODE_ENV=PROD docker-compose up'
+                sh 'NODE_ENV=PROD docker-compose up'
             }
         }
     }
