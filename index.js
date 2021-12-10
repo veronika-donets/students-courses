@@ -2,18 +2,17 @@ import { createExpressApp } from './src/app'
 import http from 'http'
 import dotenv from 'dotenv'
 import { connectToDB, defineDB, initModels } from './src/db/db'
-import { ENVIRONMENT, getEnvVar } from './src/helpers'
+import { ENVIRONMENT } from './src/helpers'
 import { defineDbRelations } from './src/db/relations'
 import DataTypes from 'sequelize'
 import { launchMockApp } from './test/__mock__/mockApp'
+dotenv.config()
 
 export async function launchApp() {
-    dotenv.config()
-
     try {
         const app = createExpressApp()
         const port = process.env.PORT || 8080
-        const host = getEnvVar('APP_HOST')
+        const host = process.env.APP_HOST || ''
 
         const server = http.createServer(app)
 

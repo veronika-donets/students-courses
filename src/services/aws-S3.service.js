@@ -1,13 +1,13 @@
 import AWS from 'aws-sdk'
-import { ENVIRONMENT, getAwsFilePath, getEnvVar } from '../helpers'
+import { ENVIRONMENT, getAwsFilePath } from '../helpers'
 import fs from 'fs'
 import { initMockBucket } from '../../test/__mock__/mockAws-S3'
 
 export const initAWSBucket = () => {
     return new AWS.S3({
-        accessKeyId: getEnvVar('IAM_USER_KEY'),
-        secretAccessKey: getEnvVar('IAM_USER_SECRET'),
-        Bucket: getEnvVar('BUCKET_NAME'),
+        accessKeyId: process.env.IAM_USER_KEY,
+        secretAccessKey: process.env.IAM_USER_SECRET,
+        Bucket: process.env.BUCKET_NAME,
     })
 }
 
@@ -22,7 +22,7 @@ export const uploadToS3 = async (file, sourceId) => {
     const awsPath = getAwsFilePath(sourceId, originalname)
 
     const params = {
-        Bucket: getEnvVar('BUCKET_NAME'),
+        Bucket: process.env.BUCKET_NAME,
         Key: awsPath,
         Body: data,
         ContentType: mimetype,
@@ -44,7 +44,7 @@ export const downloadFromS3 = (name, sourceId) => {
     const awsPath = getAwsFilePath(sourceId, name)
 
     const params = {
-        Bucket: getEnvVar('BUCKET_NAME'),
+        Bucket: process.env.BUCKET_NAME,
         Key: awsPath,
     }
 
@@ -63,7 +63,7 @@ export const removeFromS3 = (name, sourceId) => {
     const awsPath = getAwsFilePath(sourceId, name)
 
     const params = {
-        Bucket: getEnvVar('BUCKET_NAME'),
+        Bucket: process.env.BUCKET_NAME,
         Key: awsPath,
     }
 

@@ -14,7 +14,7 @@ services:
     env_file:
       - .env
     environment:
-      - DB_HOST_DEV=db
+      - DB_HOST=db
   db:
     container_name: postgres
     image: postgres:14.0-alpine
@@ -25,9 +25,9 @@ services:
     env_file:
       - .env
     environment:
-      - POSTGRES_USER=$DB_USER_DEV
-      - POSTGRES_PASSWORD=$DB_PASS_DEV
-      - POSTGRES_DB=$DB_NAME_DEV
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=$DB_NAME
     networks:
       - app-tier
 networks:

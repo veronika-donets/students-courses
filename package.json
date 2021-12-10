@@ -8,13 +8,13 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=PROD node --experimental-specifier-resolution=node index.js",
-    "dev": "NODE_ENV=DEV nodemon --experimental-specifier-resolution=node index.js",
+    "start": "node --experimental-specifier-resolution=node index.js",
+    "dev": "NODE_ENV=development nodemon --experimental-specifier-resolution=node index.js",
     "lint": "eslint '**/*.{js}' --quiet --fix",
     "prettify": "prettier --write \"src/**/*.js\" \"test/**/*.js\" \"index.js\"",
-    "test": "NODE_ENV=TEST NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
-    "docker:build": "NODE_ENV=DEV docker compose build",
-    "docker:run": "NODE_ENV=DEV docker compose up"
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
+    "docker:build": "NODE_ENV=development docker compose build",
+    "docker:run": "NODE_ENV=development docker compose up"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.7",
@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
     "faker": "^5.5.3",
     "jest": "^27.3.1",
     "nock": "^13.2.0",

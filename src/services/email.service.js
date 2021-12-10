@@ -1,6 +1,5 @@
 import { resetPasswordTemplate } from '../templates/reset-password-email'
 import { verifyEmailTemplate } from '../templates/verify-email'
-import { getEnvVar } from '../helpers'
 import sgMail from '@sendgrid/mail'
 
 export const sendEmail = async (address, subject, html) => {
@@ -32,7 +31,7 @@ const replaceLink = (template, link) => {
 
 export const sendResetPassEmail = async (emailAddress, token) => {
     try {
-        const webUrl = getEnvVar('WEB_APP')
+        const webUrl = process.env.WEB_APP_URL
         const linkTemplate = replaceLink(resetPasswordTemplate, `${webUrl}/set-password?t=${token}`)
 
         return sendEmail(emailAddress, 'Reset Password', linkTemplate)
@@ -43,7 +42,7 @@ export const sendResetPassEmail = async (emailAddress, token) => {
 
 export const sendVerificationEmail = async (emailAddress, token) => {
     try {
-        const webUrl = getEnvVar('WEB_APP')
+        const webUrl = process.env.WEB_APP_URL
         const linkTemplate = replaceLink(verifyEmailTemplate, `${webUrl}/verify/email?t=${token}`)
 
         return sendEmail(emailAddress, 'Verify Email', linkTemplate)
@@ -51,4 +50,3 @@ export const sendVerificationEmail = async (emailAddress, token) => {
         throw new Error(e)
     }
 }
-
