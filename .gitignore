@@ -51,3 +51,6 @@ uploads/*
 
 # Sertificates
 *.pem
+
+# Database
+.gradle
