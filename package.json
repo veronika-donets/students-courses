@@ -13,8 +13,8 @@
     "lint": "eslint '**/*.{js}' --quiet --fix",
     "prettify": "prettier --write \"src/**/*.js\" \"src/**/*.cjs\" \"test/**/*.js\" \"index.js\"",
     "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
-    "docker:build": "NODE_ENV=development docker compose build",
-    "docker:run": "NODE_ENV=development docker compose up",
+    "docker:build": "NODE_ENV=development docker-compose up --build",
+    "docker:rm": "docker rmi $(docker images | grep \"^<none>\")",
     "db:migration:create": "sequelize migration:generate",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo": "sequelize db:migrate:undo"
