@@ -1,4 +1,4 @@
-# students-courses
+# Course Management System API
 
 Course Management System API is an online management application. Its main purpose is to make efficient interaction between students and instructors in college during the period of submission of assignments and for getting appropriate feedback from instructors.
 
@@ -21,19 +21,19 @@ npm run dev
 
 3. Use [http://localhost:8080](http://localhost:8080) to test your work.
 
-4. Run tests:
+## Run tests:
 
 ```bash
 npm run test
 ```
 
-5. Run database migration:
+## Run database migration:
 
 ```bash
 npm run db:migrate
 ```
 
-6. Revert database migration:
+## Revert database migration:
 
 ```bash
 npm run db:migrate:undo
