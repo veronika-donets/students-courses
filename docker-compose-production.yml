@@ -1,0 +1,46 @@
+version: "3"
+services:
+  api:
+    build: .
+    container_name: sombra-courses-api
+    image: $PROJECT:$TAG
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - app-tier
+    depends_on:
+      - db
+    environment:
+      - PORT=$PORT
+      - APP_HOST=$APP_HOST
+      - DB_HOST=$DB_HOST
+      - DB_NAME=$DB_NAME
+      - DB_PATH=$DB_PATH
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - WEB_APP_URL=$WEB_APP_URL
+      - AUTH_SECRET_KEY=$AUTH_SECRET_KEY
+      - SENDGRID_EMAIL_FROM=$SENDGRID_EMAIL_FROM
+      - SENDGRID_API_KEY=$SENDGRID_API_KEY
+      - IAM_USER_KEY=$IAM_USER_KEY
+      - IAM_USER_SECRET=$IAM_USER_SECRET
+      - BUCKET_NAME=$BUCKET_NAME
+      - COURSES_ADMIN_EMAIL=$COURSES_ADMIN_EMAIL
+  db:
+    container_name: postgres
+    image: postgres:14.0-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/data/db
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=$DB_NAME
+    networks:
+      - app-tier
+networks:
+  app-tier:
+    driver: bridge
+
