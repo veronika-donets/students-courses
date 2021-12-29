@@ -21,7 +21,6 @@ pipeline {
             }
             steps {
                 sh 'docker-compose -f docker-compose-production.yml build'
-                sh 'docker rmi "${PROJECT}:${TAG}"'
             }
         }
         stage('Test') {
