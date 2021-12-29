@@ -11,18 +11,15 @@ pipeline {
     stages {
         stage('Cloning Git') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/build']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
             }
         }
         stage('Build') {
             environment {
-                NODE_ENV = 'production'
-                TAG = 'build'
+                NODE_ENV = 'test'
+                TAG = 'test'
             }
             steps {
-                sh 'pwd'
-                sh "echo $USER"
-                sh 'env | sort'
                 sh 'docker-compose -f docker-compose-production.yml build'
                 sh 'docker rmi "${PROJECT}:${TAG}"'
             }
@@ -34,7 +31,6 @@ pipeline {
                 HOME = '.'
             }
             steps {
-                sh 'docker-compose -f docker-compose-production.yml build'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm install jest'
                     sh 'npm run test'
@@ -48,7 +44,12 @@ pipeline {
                 TAG = 'latest'
             }
             steps {
-                sh 'docker-compose -f docker-compose-production.yml up --build'
+                sh 'env | sort'
+                sh 'docker-compose -f docker-compose-production.yml build'
+                withDockerContainer("${PROJECT}:${TAG}") {
+                    sh 'npm run db:migrate'
+                }
+                sh 'docker run "${PROJECT}:${TAG}"'
             }
         }
         stage('Cleaning up') {
