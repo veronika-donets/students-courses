@@ -44,6 +44,7 @@ pipeline {
                 sh 'docker-compose -f docker-compose-production.yml build'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm install sequelize-cli'
+                    sh "echo ${AUTH_SECRET_KEY}"
                 }
                 sh 'docker run "${PROJECT}:${TAG}"'
                 withDockerContainer("${PROJECT}:${TAG}") {
