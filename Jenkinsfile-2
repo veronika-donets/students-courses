@@ -4,12 +4,6 @@ pipeline {
         PROJECT = 'sombra-courses-api'
     }
     stages {
-        stage('Cloning Git to test environment') {
-            agent { label 'jenkins-slave-1' }
-            steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-            }
-        }
         stage('Build') {
             agent { label 'jenkins-slave-1' }
             environment {
@@ -17,6 +11,7 @@ pipeline {
                 TAG = 'test'
             }
             steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose -f docker-compose-production.yml build'
             }
         }
@@ -38,17 +33,12 @@ pipeline {
         }
         stage('Deploy') {
             agent { label 'jenkins-production' }
-            stage('Cloning Git to production environment') {
-                agent { label 'jenkins-production' }
-                steps {
-                    checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-                }
-            }
             environment {
                 NODE_ENV = 'production'
                 TAG = 'latest'
             }
             steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose -f docker-compose-production.yml build'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm install sequelize-cli'
