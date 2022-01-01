@@ -46,10 +46,10 @@ pipeline {
                 sh 'docker run "${PROJECT}:${TAG}"'
             }
         }
-        stage('Cleaning up') {
-            steps {
-                sh "docker rmi ${docker images | grep '^<none>'}"
-            }
+    }
+    post {
+        always {
+            sh "docker rmi ${docker images | grep '^<none>'}"
         }
     }
 }
