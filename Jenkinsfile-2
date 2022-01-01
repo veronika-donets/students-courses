@@ -3,7 +3,7 @@ pipeline {
         PROJECT = 'sombra-courses-api'
     }
     agent {
-        jenkins-slave
+        label { jenkins-slave }
     }
     stages {
         stage('Cloning Git') {
