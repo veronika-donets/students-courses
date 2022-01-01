@@ -2,12 +2,6 @@ node('jenkins-slave') {
     environment {
         PROJECT = 'sombra-courses-api'
     }
-    agent {
-        docker {
-            image 'docker/compose'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
     stages {
         stage('Cloning Git') {
             steps {
