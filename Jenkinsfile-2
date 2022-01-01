@@ -1,4 +1,5 @@
 pipeline {
+    agent none
     environment {
         PROJECT = 'sombra-courses-api'
     }
@@ -36,6 +37,7 @@ pipeline {
             }
         }
         stage('Deploy') {
+            agent { label 'jenkins-production' }
             stage('Cloning Git to production environment') {
                 agent { label 'jenkins-production' }
                 steps {
@@ -47,7 +49,6 @@ pipeline {
                 TAG = 'latest'
             }
             steps {
-                agent { label 'jenkins-production' }
                 sh 'docker-compose -f docker-compose-production.yml build'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm install sequelize-cli'
