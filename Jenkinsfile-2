@@ -28,7 +28,6 @@ pipeline {
                     sh 'npm run test'
                 }
                 sh 'docker rmi "${PROJECT}:${TAG}"'
-                sh "docker rmi ${docker images | grep '^<none>'}"
             }
         }
         stage('Deploy') {
