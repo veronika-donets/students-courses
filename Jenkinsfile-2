@@ -39,6 +39,7 @@ pipeline {
                 TAG = 'latest'
             }
             steps {
+                sh 'env | sort'
                 checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose -f docker-compose-production.yml build'
                 withDockerContainer("${PROJECT}:${TAG}") {
