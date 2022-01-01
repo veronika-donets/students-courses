@@ -2,14 +2,15 @@ pipeline {
     environment {
         PROJECT = 'sombra-courses-api'
     }
-    agent { label 'jenkins-slave-1' }
     stages {
-        stage('Cloning Git') {
+        stage('Cloning Git to test environment') {
+            agent { label 'jenkins-slave-1' }
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
             }
         }
         stage('Build') {
+            agent { label 'jenkins-slave-1' }
             environment {
                 NODE_ENV = 'test'
                 TAG = 'test'
@@ -19,6 +20,7 @@ pipeline {
             }
         }
         stage('Test') {
+            agent { label 'jenkins-slave-1' }
             environment {
                 NODE_ENV = 'test'
                 TAG = 'test'
@@ -30,14 +32,22 @@ pipeline {
                     sh 'npm run test'
                 }
                 sh 'docker rmi "${PROJECT}:${TAG}"'
+                sh "docker rmi ${docker images | grep '^<none>'}"
             }
         }
         stage('Deploy') {
+            stage('Cloning Git to production environment') {
+                agent { label 'jenkins-production' }
+                steps {
+                    checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
+                }
+            }
             environment {
                 NODE_ENV = 'production'
                 TAG = 'latest'
             }
             steps {
+                agent { label 'jenkins-production' }
                 sh 'docker-compose -f docker-compose-production.yml build'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm install sequelize-cli'
@@ -49,6 +59,7 @@ pipeline {
     }
     post {
         always {
+            agent { label 'jenkins-production' }
             sh "docker rmi ${docker images | grep '^<none>'}"
         }
     }
