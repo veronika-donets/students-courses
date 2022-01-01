@@ -38,7 +38,6 @@ pipeline {
                 TAG = 'latest'
             }
             steps {
-                sh 'env | sort'
                 sh 'docker-compose -f docker-compose-production.yml build'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm install sequelize-cli'
