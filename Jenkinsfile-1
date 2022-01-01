@@ -1,5 +1,5 @@
 node('jenkins-slave') {
     stage('Hostname') {
-        hostname
+        sh 'hostname'
     }
 }
