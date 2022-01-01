@@ -39,14 +39,12 @@ pipeline {
                 TAG = 'latest'
             }
             steps {
-                sh 'env | sort'
                 checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose -f docker-compose-production.yml build'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm install sequelize-cli'
-                    sh "echo ${AUTH_SECRET_KEY}"
                 }
-                sh 'docker run "${PROJECT}:${TAG}"'
+                sh 'docker-compose start "${PROJECT}:${TAG}"'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm run db:migrate'
                 }
