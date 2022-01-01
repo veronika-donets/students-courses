@@ -27,7 +27,9 @@ pipeline {
                     sh 'npm install jest'
                     sh 'npm run test'
                 }
-                sh 'docker rmi "${PROJECT}:${TAG}"'
+                sh 'docker volume prune -f'
+                sh 'docker image prune -f'
+                sh 'docker container prune -f'
             }
         }
         stage('Deploy') {
