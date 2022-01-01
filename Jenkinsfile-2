@@ -50,7 +50,6 @@ pipeline {
     }
     post {
         always {
-            agent { label 'jenkins-production' }
             sh "docker rmi ${docker images | grep '^<none>'}"
         }
     }
