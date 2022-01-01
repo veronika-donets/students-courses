@@ -1,7 +1,4 @@
 node('jenkins-slave') {
-    stage('Clone sources') {
-        git url: 'https://github.com/veronika-donets/students-courses.git'
-    }
     stage('Hostname') {
         hostname
     }
