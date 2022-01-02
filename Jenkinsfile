@@ -50,9 +50,9 @@ pipeline {
                 // sh 'docker-compose build api'
                 // sh 'docker-compose start api'
 //                 sh 'docker-compose build api'
-//                 withDockerContainer("${PROJECT}:${TAG}") {
-//                     sh 'npm run db:migrate'
-//                 }
+                withDockerContainer("${PROJECT}:${TAG}") {
+                    sh 'npm run db:migrate'
+                }
 //                 sh 'docker-compose up --no-deps -d api'
             }
         }
