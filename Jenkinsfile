@@ -40,7 +40,7 @@ pipeline {
             when { environment name: 'GIT_BRANCH', value: 'origin/jenkins' }
             agent { label 'jenkins-production' }
             environment {
-                NODE_ENV = 'production'
+                NODE_ENV = 'development'
                 TAG = 'latest'
             }
             steps {
