@@ -40,7 +40,7 @@ pipeline {
             when { environment name: 'GIT_BRANCH', value: 'origin/jenkins' }
             agent { label 'jenkins-production' }
             environment {
-                NODE_ENV = 'development'
+                NODE_ENV = 'production'
                 TAG = 'latest'
             }
             steps {
@@ -51,7 +51,7 @@ pipeline {
                 // sh 'docker-compose start api'
 //                 sh 'docker-compose build api'
                 withDockerContainer(PROJECT) {
-                    sh 'npm run db:migrate'
+                    sh 'sequelize db:migrate'
                 }
 //                 sh 'docker-compose up --no-deps -d api'
             }
