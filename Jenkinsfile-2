@@ -40,14 +40,11 @@ pipeline {
             }
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-                sh 'docker-compose build'
-                withDockerContainer("${PROJECT}:${TAG}") {
-                    sh 'npm install sequelize-cli'
-                }
-                sh 'docker-compose up'
+                sh 'docker-compose build api'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm run db:migrate'
                 }
+                sh 'docker-compose up --no-deps -d api'
             }
         }
     }
