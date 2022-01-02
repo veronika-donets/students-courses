@@ -11,7 +11,8 @@ pipeline {
                 TAG = 'test'
             }
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
+                sh 'echo ${env.BRANCH_NAME}'
+                checkout([$class: 'GitSCM', branches: [[name: '*/${env.BRANCH_NAME}']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose build'
             }
         }
@@ -33,6 +34,7 @@ pipeline {
             }
         }
         stage('Deploy') {
+            when { branch 'jenkins' }
             agent { label 'jenkins-production' }
             environment {
                 NODE_ENV = 'production'
@@ -40,11 +42,13 @@ pipeline {
             }
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-                sh 'docker-compose build api'
-                withDockerContainer("${PROJECT}:${TAG}") {
-                    sh 'npm run db:migrate'
-                }
-                sh 'docker-compose up --no-deps -d api'
+                sh 'docker-compose build'
+                sh 'docker-compose start api'
+//                 sh 'docker-compose build api'
+//                 withDockerContainer("${PROJECT}:${TAG}") {
+//                     sh 'npm run db:migrate'
+//                 }
+//                 sh 'docker-compose up --no-deps -d api'
             }
         }
     }
