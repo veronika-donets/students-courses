@@ -11,7 +11,7 @@ pipeline {
                 TAG = 'test'
             }
             steps {
-                sh 'echo ${env.BRANCH_NAME}'
+                sh "echo ${env.BRANCH_NAME}"
                 checkout([$class: 'GitSCM', branches: [[name: '*/${env.BRANCH_NAME}']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose build'
             }
