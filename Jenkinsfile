@@ -5,6 +5,7 @@ pipeline {
     }
     stages {
         stage('Build') {
+            when { environment name: 'GIT_BRANCH', value: 'origin/main' }
             agent { label 'jenkins-slave-1' }
             environment {
                 NODE_ENV = 'test'
@@ -18,6 +19,7 @@ pipeline {
             }
         }
         stage('Test') {
+            when { environment name: 'GIT_BRANCH', value: 'origin/main' }
             agent { label 'jenkins-slave-1' }
             environment {
                 NODE_ENV = 'test'
@@ -43,8 +45,9 @@ pipeline {
             }
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: GIT_BRANCH]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-                sh 'docker-compose build'
+                sh 'docker-compose build db'
                 sh 'docker-compose start db'
+                sh 'docker-compose build api'
                 sh 'docker-compose start api'
 //                 sh 'docker-compose build api'
 //                 withDockerContainer("${PROJECT}:${TAG}") {
