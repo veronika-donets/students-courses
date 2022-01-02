@@ -50,9 +50,10 @@ pipeline {
                 // sh 'docker-compose build api'
                 // sh 'docker-compose start api'
 //                 sh 'docker-compose build api'
-                withDockerContainer(PROJECT) {
-                    sh 'sequelize db:migrate'
-                }
+                sh 'sequelize db:migrate'
+//                 withDockerContainer(PROJECT) {
+//                     sh 'sequelize db:migrate'
+//                 }
 //                 sh 'docker-compose up --no-deps -d api'
             }
         }
