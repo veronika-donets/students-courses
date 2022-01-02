@@ -44,7 +44,7 @@ pipeline {
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm install sequelize-cli'
                 }
-                sh 'docker-compose start "${PROJECT}:${TAG}"'
+                sh 'docker-compose -f docker-compose-production.yml start "${PROJECT}:${TAG}"'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm run db:migrate'
                 }
