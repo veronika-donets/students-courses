@@ -1,29 +1,22 @@
 pipeline {
+    agent none
     environment {
         PROJECT = 'sombra-courses-api'
     }
-    agent {
-        docker {
-            image 'docker/compose'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
     stages {
-        stage('Cloning Git') {
-            steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-            }
-        }
         stage('Build') {
+            agent { label 'jenkins-slave-1' }
             environment {
                 NODE_ENV = 'test'
                 TAG = 'test'
             }
             steps {
-                sh 'docker-compose -f docker-compose-production.yml build'
+                checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
+                sh 'docker-compose build'
             }
         }
         stage('Test') {
+            agent { label 'jenkins-slave-1' }
             environment {
                 NODE_ENV = 'test'
                 TAG = 'test'
@@ -34,26 +27,24 @@ pipeline {
                     sh 'npm install jest'
                     sh 'npm run test'
                 }
-                sh 'docker rmi "${PROJECT}:${TAG}"'
+                sh 'docker volume prune -f'
+                sh 'docker image prune -f'
+                sh 'docker container prune -f'
             }
         }
         stage('Deploy') {
+            agent { label 'jenkins-production' }
             environment {
                 NODE_ENV = 'production'
                 TAG = 'latest'
             }
             steps {
-                sh 'env | sort'
-                sh 'docker-compose -f docker-compose-production.yml build'
+                checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
+                sh 'docker-compose build api'
                 withDockerContainer("${PROJECT}:${TAG}") {
                     sh 'npm run db:migrate'
                 }
-                sh 'docker run "${PROJECT}:${TAG}"'
-            }
-        }
-        stage('Cleaning up') {
-            steps {
-                sh "docker rmi ${docker images | grep '^<none>'}"
+                sh 'docker-compose up --no-deps -d api'
             }
         }
     }
