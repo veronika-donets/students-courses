@@ -45,9 +45,9 @@ pipeline {
             }
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: GIT_BRANCH]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-                sh 'docker-compose build db'
-                sh 'docker-compose start db'
-                sh 'docker-compose build api'
+                sh 'docker-compose -f docker-compose.yml build'
+                // sh 'docker-compose start db'
+                // sh 'docker-compose build api'
                 sh 'docker-compose start api'
 //                 sh 'docker-compose build api'
 //                 withDockerContainer("${PROJECT}:${TAG}") {
