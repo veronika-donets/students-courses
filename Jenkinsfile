@@ -51,7 +51,7 @@ pipeline {
                 // sh 'docker-compose build api'
                 // sh 'docker-compose start api'
 //                 sh 'docker-compose build api'
-                sh 'docker exec -it sombra-courses-api npm run db:migrate'
+                sh 'docker exec sombra-courses-api npm run db:migrate'
 //                 withDockerContainer(PROJECT) {
 //                     sh 'sequelize db:migrate'
 //                 }
