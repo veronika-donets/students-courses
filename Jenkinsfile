@@ -5,7 +5,6 @@ pipeline {
     }
     stages {
         stage('Build') {
-            when { environment name: 'GIT_BRANCH', value: 'origin/main' }
             agent { label 'jenkins-slave-1' }
             environment {
                 NODE_ENV = 'test'
@@ -19,7 +18,6 @@ pipeline {
             }
         }
         stage('Test') {
-            when { environment name: 'GIT_BRANCH', value: 'origin/main' }
             agent { label 'jenkins-slave-1' }
             environment {
                 NODE_ENV = 'test'
@@ -45,7 +43,7 @@ pipeline {
             }
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: GIT_BRANCH]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-                sh 'docker-compose -f docker-compose.yml rm up --build -d'
+                sh 'docker-compose -f docker-compose.yml up --build -d'
                 sh "docker exec -e NODE_ENV=${NODE_ENV} ${PROJECT} npm run db:migrate"
             }
         }
