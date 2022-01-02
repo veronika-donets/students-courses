@@ -23,11 +23,11 @@ pipeline {
                 HOME = '.'
             }
             steps {
-                withDockerContainer("${PROJECT}:${TAG}") {
+                withDockerContainer(PROJECT) {
                     sh 'npm install jest'
                     sh 'npm run test'
                 }
-                sh 'docker system prune -a'
+                sh 'docker system prune -f'
             }
         }
         stage('Deploy') {
