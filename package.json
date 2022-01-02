@@ -16,7 +16,7 @@
     "docker:build": "NODE_ENV=development docker-compose -f docker-compose-dev.yml up --build",
     "docker:clean": "docker rmi $(docker images | grep \"^<none>\")",
     "db:migration:create": "sequelize migration:generate",
-    "db:migrate": "sequelize db:migrate",
+    "db:migrate": "sequelize db:migrate --config src/db/migrations/config/db-config.cjs",
     "db:migrate:undo": "sequelize db:migrate:undo"
   },
   "dependencies": {
