@@ -12,6 +12,7 @@ pipeline {
             }
             steps {
                 sh 'printenv'
+                sh "echo ${GIT_BRANCH}"
                 checkout([$class: 'GitSCM', branches: [[name: "*/jenkins"]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose build'
             }
@@ -34,7 +35,7 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when { branch 'jenkins' }
+            when { branch '*/jenkins' }
             agent { label 'jenkins-production' }
             environment {
                 NODE_ENV = 'production'
