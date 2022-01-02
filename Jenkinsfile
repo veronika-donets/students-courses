@@ -13,7 +13,7 @@ pipeline {
             steps {
                 sh 'printenv'
                 sh "echo ${GIT_BRANCH}"
-                checkout([$class: 'GitSCM', branches: [[name: "*/jenkins"]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: GIT_BRANCH]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose build'
             }
         }
@@ -35,14 +35,14 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when { branch '*/jenkins' }
+            when { branch 'origin/jenkins' }
             agent { label 'jenkins-production' }
             environment {
                 NODE_ENV = 'production'
                 TAG = 'latest'
             }
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/jenkins']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: GIT_BRANCH]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
                 sh 'docker-compose build'
                 sh 'docker-compose start api'
 //                 sh 'docker-compose build api'
