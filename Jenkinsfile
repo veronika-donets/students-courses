@@ -45,17 +45,8 @@ pipeline {
             }
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: GIT_BRANCH]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
-                sh 'whoami'
-                sh 'docker-compose -f docker-compose.yml up --build -d'
-                // sh 'docker-compose start db'
-                // sh 'docker-compose build api'
-                // sh 'docker-compose start api'
-//                 sh 'docker-compose build api'
+                sh 'docker-compose -f docker-compose.yml rm up --build -d'
                 sh "docker exec -e NODE_ENV=${NODE_ENV} ${PROJECT} npm run db:migrate"
-//                 withDockerContainer(PROJECT) {
-//                     sh 'sequelize db:migrate'
-//                 }
-//                 sh 'docker-compose up --no-deps -d api'
             }
         }
     }
