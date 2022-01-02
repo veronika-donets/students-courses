@@ -35,7 +35,7 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when { branch 'origin/jenkins' }
+            when { environment name: 'GIT_BRANCH', value: 'origin/jenkins' }
             agent { label 'jenkins-production' }
             environment {
                 NODE_ENV = 'production'
