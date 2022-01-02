@@ -20,21 +20,3 @@ npm run dev
 ```
 
 3. Use [http://localhost:8080](http://localhost:8080) to test your work.
-
-## Run tests:
-
-```bash
-npm run test
-```
-
-## Run database migration:
-
-```bash
-npm run db:migrate
-```
-
-## Revert database migration:
-
-```bash
-npm run db:migrate:undo
-```
