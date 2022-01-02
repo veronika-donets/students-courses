@@ -12,9 +12,6 @@ let sequelize
 if (config.use_env_variable) {
     sequelize = new Sequelize(process.env[config.use_env_variable], config)
 } else {
-    console.log('config.database', config.database)
-    console.log('config.username', config.username)
-    console.log('config.password', config.password)
     sequelize = new Sequelize(config.database, config.username, config.password, config)
 }
 
@@ -25,7 +22,6 @@ fs.readdirSync(__dirname)
     .forEach((file) => {
         const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes)
         db[model.name] = model
-        console.log('db', db)
     })
 
 Object.keys(db).forEach((modelName) => {

@@ -45,12 +45,13 @@ pipeline {
             }
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: GIT_BRANCH]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/veronika-donets/students-courses.git']]])
+                sh 'whoami'
                 sh 'docker-compose -f docker-compose.yml up --build -d'
                 // sh 'docker-compose start db'
                 // sh 'docker-compose build api'
                 // sh 'docker-compose start api'
 //                 sh 'docker-compose build api'
-                sh 'sequelize db:migrate'
+                sh 'docker exec -it sombra-courses-api npm run db:migrate'
 //                 withDockerContainer(PROJECT) {
 //                     sh 'sequelize db:migrate'
 //                 }
