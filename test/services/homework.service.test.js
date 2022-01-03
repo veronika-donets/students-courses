@@ -102,6 +102,6 @@ describe('Homework service testing', () => {
         expect(homework.isCoursePassed).toBe(mockHomework.isCoursePassed)
         expect(homework.finalMark).toBe(mockHomework.finalMark)
         expect(homework.feedback).toBe(mockHomework.feedback)
-        expect(homework.Lessons).toBeDefined()
+        expect(homework.Lesson).toBeDefined()
     })
 })

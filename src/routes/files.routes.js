@@ -4,6 +4,7 @@ import { Router } from 'express'
 import { downloadFromS3 } from '../services/aws-S3.service'
 import Lodash from 'lodash'
 import { getFileByIdWithSource } from '../services/file.service'
+import { getUserById, getUserIdFromToken } from "../services/user.service"
 
 const router = Router()
 
@@ -13,6 +14,17 @@ router.get(
     async (req, res) => {
         try {
             const { id } = req.params
+            const { jwt } = req.headers
+
+            let isAdmin = false
+
+            if (jwt) {
+                const id = await getUserIdFromToken(jwt)
+                const { role } = await getUserById(id)
+                if (role === USER_ROLES.ADMIN) {
+                    isAdmin = true
+                }
+            }
 
             const result = await getFileByIdWithSource(id)
 
@@ -22,7 +34,7 @@ router.get(
 
             const { originalname, sourceId, Homework, Lesson } = result
 
-            if (!Homework && Lodash.isEmpty(Lesson.Course.Results)) {
+            if (!Homework && Lodash.isEmpty(Lesson.Course.Results) && !isAdmin) {
                 return res.status(403).json({ message: 'You are not authorized to see this file' })
             }
 
