@@ -6,6 +6,7 @@ import {
     getStudentsPerCourse,
     updateFeedback,
 } from '../services/result.service'
+import { getCourseById } from "../services/course.service"
 
 const router = Router()
 
@@ -54,6 +55,12 @@ router.get(
 
             if (!courseId) {
                 return res.status(404).json({ message: 'Course Id is not provided' })
+            }
+
+            const course = await getCourseById(courseId)
+
+            if (!course) {
+                return res.status(404).json({ message: 'Course not found' })
             }
 
             const studentList = await getStudentsPerCourse(courseId)

@@ -221,6 +221,10 @@ router.get('/', async (req, res) => {
 
         const course = await getCourseWithLessonsById(id)
 
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' })
+        }
+
         if (!isAdmin && (course.Lessons.length < 5 || Lodash.isEmpty(course.instructorIds))) {
             return res.status(403).json({ message: 'You are not authorized to see this course' })
         }

@@ -45,7 +45,7 @@ export const createUploadedFile = ({ originalname, mimetype, size }, sourceId) =
 }
 
 export const createUploadedFilesWithS3 = (files, sourceId) => {
-    if (Lodash.isEmpty(files)) return
+    if (Lodash.isEmpty(files)) return []
 
     return Promise.all(
         files.map(async (file) => {
