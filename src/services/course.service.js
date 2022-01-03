@@ -38,14 +38,14 @@ export const getCourseWithRelations = (id) => {
                         include: [
                             {
                                 model: File,
-                                attributes: ['id'],
+                                attributes: ['id', 'originalname', 'sourceId'],
                                 required: false,
                             },
                         ],
                     },
                     {
                         model: File,
-                        attributes: ['id'],
+                        attributes: ['id', 'originalname', 'sourceId'],
                         required: false,
                     },
                 ],

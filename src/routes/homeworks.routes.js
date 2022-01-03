@@ -4,7 +4,6 @@ import { checkUnsupportedFormat, USER_ROLES } from '../helpers'
 import multer from 'multer'
 import {
     cleanUploadsFolder,
-    createUploadedFile,
     createUploadedFilesWithS3,
     removeFiles,
 } from '../services/file.service'
@@ -138,8 +137,7 @@ router.put(
             await updateHomework(homeworkId, comment)
 
             if (!Lodash.isEmpty(files)) {
-                await Promise.all(files.map((file) => createUploadedFile(homeworkId, file)))
-
+                await createUploadedFilesWithS3(files, homeworkId)
                 const uploadedFileIds = existedHomework.Files.map((el) => el.id)
                 await removeFiles(uploadedFileIds)
             }
@@ -215,7 +213,7 @@ router.put(
 
             await putMark(homeworkId, mark)
 
-            const { Lessons: Lesson, studentId } = homework
+            const { Lesson, studentId } = homework
 
             // Check if a student submit all homeworks to all lessons per course
 
