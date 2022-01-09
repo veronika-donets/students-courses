@@ -4,7 +4,7 @@ import { Router } from 'express'
 import { downloadFromS3 } from '../services/aws-S3.service'
 import Lodash from 'lodash'
 import { getFileByIdWithSource } from '../services/file.service'
-import { getUserById, getUserIdFromToken } from "../services/user.service"
+import { getUserById, getUserIdFromToken } from '../services/user.service'
 
 const router = Router()
 
