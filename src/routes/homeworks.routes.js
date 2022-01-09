@@ -5,7 +5,7 @@ import multer from 'multer'
 import {
     cleanUploadsFolder,
     createUploadedFilesWithS3,
-    removeFiles,
+    removeFilesWithS3,
 } from '../services/file.service'
 import { getUserById, getUserIdFromToken } from '../services/user.service'
 import {
@@ -138,8 +138,7 @@ router.put(
 
             if (!Lodash.isEmpty(files)) {
                 await createUploadedFilesWithS3(files, homeworkId)
-                const uploadedFileIds = existedHomework.Files.map((el) => el.id)
-                await removeFiles(uploadedFileIds)
+                await removeFilesWithS3(existedHomework.Files)
             }
 
             res.json({ message: 'Homework successfully updated' })

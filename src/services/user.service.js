@@ -30,7 +30,7 @@ export const getUserByEmailWithRelations = (userEmail) => {
                 include: [
                     {
                         model: File,
-                        attributes: ['id'],
+                        attributes: ['id', 'sourceId', 'originalname'],
                         required: false,
                     },
                 ],

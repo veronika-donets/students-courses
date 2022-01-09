@@ -6,7 +6,7 @@ module.exports = {
                 'Homeworks',
                 'feedback',
                 {
-                  type: Sequelize.DataTypes.STRING,
+                    type: Sequelize.DataTypes.STRING,
                 },
                 { transaction }
             )
@@ -19,9 +19,7 @@ module.exports = {
     async down(queryInterface) {
         const transaction = await queryInterface.sequelize.transaction()
         try {
-            await queryInterface.removeColumn(
-              'Homeworks', 'feedback', { transaction }
-            )
+            await queryInterface.removeColumn('Homeworks', 'feedback', { transaction })
             await transaction.commit()
         } catch (err) {
             await transaction.rollback()

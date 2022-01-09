@@ -6,7 +6,7 @@ import {
     getStudentsPerCourse,
     updateFeedback,
 } from '../services/result.service'
-import { getCourseById } from "../services/course.service"
+import { getCourseById } from '../services/course.service'
 
 const router = Router()
 

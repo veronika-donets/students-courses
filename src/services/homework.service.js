@@ -1,5 +1,5 @@
 import Lodash from 'lodash'
-import { removeFiles } from './file.service'
+import { removeFilesWithS3 } from './file.service'
 import { Homework, Lesson, File } from '../../index'
 
 export const getHomeworkWithFilesById = (id) => {
@@ -9,7 +9,7 @@ export const getHomeworkWithFilesById = (id) => {
         include: [
             {
                 model: File,
-                attributes: ['id'],
+                attributes: ['id', 'sourceId', 'originalname'],
                 required: false,
             },
         ],
@@ -53,9 +53,9 @@ export const removeHomeworksWithRelations = async (homeworks) => {
     if (Lodash.isEmpty(homeworks)) return
 
     const homeworkIds = homeworks.map((el) => el.id)
-    const homeworkFileIds = homeworks.map((el) => el.Files.map((file) => file.id)).flat(1)
+    const homeworkFiles = homeworks.map((el) => el.Files).flat(1)
 
-    await removeFiles(homeworkFileIds)
+    await removeFilesWithS3(homeworkFiles)
 
     return Homework.destroy({ where: { id: homeworkIds } })
 }
