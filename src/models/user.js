@@ -48,11 +48,6 @@ export const UserModel = (sequelize, DataTypes) =>
                 allowNull: false,
                 defaultValue: false,
             },
-            isPhoneVerified: {
-              type: DataTypes.BOOLEAN,
-              allowNull: false,
-              defaultValue: false,
-            },
             password: {
                 type: DataTypes.STRING,
                 allowNull: false,
